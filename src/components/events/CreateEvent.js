@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Markdown } from 'react-showdown'
 import firebase from 'firebase/app'
 import {Link} from 'react-router-dom'
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   Container,
@@ -9,13 +10,9 @@ import {
   TextField,
   TextareaAutosize,
   Button,
-  Input,
-  DialogContent,
-  Dialog,
-  DialogActions,
-  DialogContentText
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import Popup from '../Popup'
 
 let useStyles = makeStyles({
   create: {
@@ -31,41 +28,54 @@ let useStyles = makeStyles({
 })
 
 export default function CreatPost() {
-  const [markInput, changeMark] = useState('Review HTML')
-  const [dialog, setDialog] = useState(false)
+const [ markInput, changeMark ] = useState('Review HTML')
+  const [ dialog, setDialog ] = useState(false)
   let classes = useStyles()
   let storage = firebase.storage()
   let storageRef = storage.ref()
-  let handleClose = () => {
-    setDialog(false)
+  let getTypeOfFile = (string) => {
+    let a = string.split('.')
+    return a[a.length - 1]
   }
+  
   let createPostHandler = e => {
     e.preventDefault()
     let files = e.target.imageInput.files
+    let fileSquare = e.target.imageSquare.files[0]
+    let fileRect = e.target.imageRect.files[0]
     let fileNames = []
-    console.log(files)
+    let nameSquare = `${uuidv4()}.${getTypeOfFile(fileSquare.name)}`
+    let nameRect = `${uuidv4()}.${getTypeOfFile(fileRect.name)}`
     for (const file of files) {
-      fileNames.push(`${new Date().toISOString()}_${file.name}`)
+      let type = getTypeOfFile(file.name)
+      fileNames.push(`${uuidv4()}.${type}`);
     }
     let data = {
       title: e.target.eventTitle.value,
-      markdown: e.target.markInput.value,
+      content: e.target.markInput.value,
       createdAt: new Date().toISOString(),
       photos: fileNames,
-      author: firebase.auth().currentUser.email,
+      main_photos: {
+        square: nameSquare,
+        rect : nameRect
+      },
     }
     firebase
       .firestore()
       .collection('events')
       .add(data)
       .then(() => {
-        for (const file of files) {
-          storageRef.child(file.name).put(file)
+        storageRef.child(`/events/${nameSquare}`).put(fileSquare)
+        storageRef.child(`/events/${nameRect}`).put(fileRect)
+        for (let i = 0 ; i < files.length; i++){
+          storageRef.child(`/events/${fileNames[i]}`).put(files[i])
         }
       })
       .then(() => setDialog(true))
       .catch(err => console.log(err))
-  }
+    }
+  
+    
   return (
     <Container>
       <Grid container>
@@ -73,12 +83,8 @@ export default function CreatPost() {
           <form onSubmit={createPostHandler}>
             <TextField name='eventTitle' label='Title Event' />
             <input type='file' name='imageInput' multiple></input>
-            {/* <FilledInput
-              type='file'
-              label='Standard'
-              name='imageInput'
-              multiple
-            ></FilledInput> */}
+            <input type='file' name='imageSquare' ></input>
+            <input type='file' name='imageRect' ></input>
             <TextareaAutosize
               name='markInput'
               rows='20'
@@ -94,18 +100,49 @@ export default function CreatPost() {
           <Markdown markup={markInput} />
         </Grid>
       </Grid>
-      <Dialog open={dialog}>
-        <DialogContent>
-          <DialogContentText>Đã post thành công</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Link to='/events'>
-            <Button onClick={handleClose} color='primary'>
-              Đóng
-            </Button>
-          </Link>
-        </DialogActions>
-      </Dialog>
+      <Popup show={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} direction="/events"/>
     </Container>
   )
 }
+
+
+
+// let a = [ 
+//   {
+//     title: tung,
+//     name: mac
+//   },
+//   {
+//     title: tung1,
+//     name: mac
+//   },
+//   {
+//     title: tung2,
+//     name: mac
+//   }
+// ]
+// let b = [
+//   {
+//     title: tung2,
+//     name: mac,
+//     age: 10
+//   },
+//   {
+//     title: tung4,
+//     name: mac,
+//     age: 10
+//   } 
+// ]
+// function find(arr, title) {
+//   let ans = -1;
+//   arr.forEach((item, i) => ans = (item.title === title) ? i : ans);
+// }
+
+// function merge(arr1, arr2) {
+//   arr1.forEach((item, i) => {
+//     let index = find(arr2, item.title);
+//     if (index !== -1) {
+//       arr1[i] = arr2[index];
+//     }
+//   });
+// }

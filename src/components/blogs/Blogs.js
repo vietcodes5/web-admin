@@ -1,18 +1,18 @@
 import React,{useState, useEffect} from 'react'
-import { Container, Grid, Button, TextField, Paper,TableContainer,
+import { Container, Grid, Button, Paper,TableContainer,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
-  TableFooter,
-  TablePagination, } from '@material-ui/core'
+  TableFooter } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import EditIcon from '@material-ui/icons/Edit'
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import IconButton from '@material-ui/core/IconButton'
 import { Link } from 'react-router-dom'
 import firebase from 'firebase'
+import Popup from '../Popup'
 
 let useStyles = makeStyles({
   root: {
@@ -22,9 +22,9 @@ let useStyles = makeStyles({
 export default function Posts() {
   let classes = useStyles()
   let db = firebase.firestore()
-  const [posts, setPosts] = useState([])
+  const [blogs, setBlogs] = useState([])
   useEffect(()=>{
-    db.collection('posts').get().then(
+    db.collection('blogs').get().then(
       data =>{
         let result = data.docs.map(doc =>{
           return {
@@ -32,10 +32,10 @@ export default function Posts() {
             id: doc.id
           }
         })
-        let docs = result.map((post, i) =>
-          <Post id={post.id} title={post.title} key={i} stt={i+1}/>
+        let docs = result.map((blog, i) =>
+          <Blog id={blog.id} title={blog.title} key={i} stt={i+1}/>
         )
-        setPosts(docs)
+        setBlogs(docs)
     })
   }, [])
 
@@ -43,9 +43,9 @@ export default function Posts() {
     <Container className={classes.root}>
       <Paper>
         <Grid container>
-          <Link to='/createpost'>
+          <Link to='/createblog'>
             <Button variant='contained' color='primary'>
-              Thêm post
+              Thêm blog
             </Button>
           </Link>
         </Grid>
@@ -58,7 +58,7 @@ export default function Posts() {
                 <TableCell align='center'>Actions</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>{posts}</TableBody>
+            <TableBody>{blogs}</TableBody>
             <TableFooter>
               {/* <TablePagination rowsPerPage={5} page={1} count={100} ></TablePagination> */}
             </TableFooter>
@@ -68,13 +68,17 @@ export default function Posts() {
     </Container>
   )
 }
-function Post(props) {
+function Blog(props) {
+  const [dialog, setDialog] = useState(false);
+
   let deleteEvent = ()=>{
     firebase.firestore()
-    .collection('posts')
+    .collection('blogs')
     .doc(props.id)
     .delete()
-    .then(()=> console.log("Done"))
+    .then(()=> {
+      setDialog(false);
+    })
     .catch((err)=> console.log(err))
   }
   return (
@@ -85,10 +89,18 @@ function Post(props) {
         <IconButton>
           <EditIcon />
         </IconButton>
-        <IconButton onClick={deleteEvent} >
+        <IconButton onClick={() => setDialog(true)}>
           <DeleteOutlineIcon />
         </IconButton>
       </TableCell>
+      <Popup
+        direction = '/blogs'
+        content="Bạn có chắc chắn muốn xoá ?"
+        updatePopup={setDialog}
+        show={dialog}
+        btnConfirm="Xoá"
+        btnConfirmAction={deleteEvent}
+      />
     </TableRow>
   )
 }

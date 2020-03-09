@@ -14,7 +14,6 @@ export default function Header(){
                     <Typography>
                         Admin VietCode
                     </Typography>
-
                 </Toolbar>
             </AppBar>
     )

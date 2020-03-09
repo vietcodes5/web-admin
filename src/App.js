@@ -3,6 +3,7 @@ import firebase from 'firebase/app'
 
 import Login from './templates/Login'
 import Admin from './templates/Admin'
+import "./App.css"
 
 
 
