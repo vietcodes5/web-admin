@@ -8,11 +8,11 @@ import {
   TextField,
   TextareaAutosize,
   Button,
-  FilledInput
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 import Popup from "../Popup";
+import InputFile from "../InputFile"
 
 let useStyles = makeStyles({
   create: {
@@ -69,6 +69,7 @@ export default function CreatPost() {
     console.log(idSerie);
 
     let fileNames = [];
+    //eslint-disable-next-line
     for (const file of files) {
       fileNames.push(uuidv4());
     }
@@ -112,7 +113,7 @@ export default function CreatPost() {
           <form onSubmit={createPostHandler}>
             <TextField name="postTitle" label="Tile Post" />
             <TextField name="openingInput" label="Opening" />
-            <input type="file" name="imageInput" multiple></input>
+            <InputFile label="Chọn ảnh cho Blog" name="imageInput" multiple={true}/>
 
             <Autocomplete
               id="combo-box-demo"

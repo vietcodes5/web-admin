@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Markdown } from 'react-showdown'
 import firebase from 'firebase/app'
-import {Link} from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
 
 import {
@@ -13,6 +12,7 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import Popup from '../Popup'
+import InputFile from '../InputFile'
 
 let useStyles = makeStyles({
   create: {
@@ -82,9 +82,9 @@ const [ markInput, changeMark ] = useState('Review HTML')
         <Grid container xs direction='column' className={classes.create}>
           <form onSubmit={createPostHandler}>
             <TextField name='eventTitle' label='Title Event' />
-            <input type='file' name='imageInput' multiple></input>
-            <input type='file' name='imageSquare' ></input>
-            <input type='file' name='imageRect' ></input>
+            <InputFile name='imageInput' multiple={true} label="Chọn ảnh cho event"/>
+            <InputFile name='imageSquare' multiple={false}  label="Ảnh Square" />
+            <InputFile name='imageRect' multiple={false} label="Ảnh Rect" />
             <TextareaAutosize
               name='markInput'
               rows='20'

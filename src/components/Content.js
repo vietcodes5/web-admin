@@ -5,7 +5,7 @@ import Blogs from './blogs/Blogs'
 import CreateBlog from './blogs/CreateBlog'
 import Events from './events/Events' 
 import CreateEvent from './events/CreateEvent'
-// import Home from '../templates/Home'
+// import Home from './Home'
 
 export default function Content() {
   return (

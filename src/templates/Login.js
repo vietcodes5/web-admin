@@ -57,6 +57,7 @@ function Login() {
             name='passwordInput'
             label='Password'
             variant='outlined'
+            type="password"
           ></TextField>
           <Button type="submit"
             variant='contained'

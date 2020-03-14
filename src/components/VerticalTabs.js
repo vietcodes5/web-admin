@@ -33,7 +33,7 @@ export default function VerticalTabs(props) {
   };
   return (
     <List component="nav" className={classes.tabs}>
-      <Link style={{ textDecoration: "none", color: "black" }} to="/">
+      {/* <Link style={{ textDecoration: "none", color: "black" }} to="/">
         <ListItem
           button
           selected={selectedIndex === 0}
@@ -44,7 +44,7 @@ export default function VerticalTabs(props) {
           </ListItemIcon>
           <ListItemText primary="Home" />
         </ListItem>
-      </Link>
+      </Link> */}
       <Link style={{ textDecoration: "none", color: "black" }} to="/blogs">
         <ListItem
           button
