@@ -1,34 +1,63 @@
 import React, { useState, useEffect } from "react";
-import { Markdown } from "react-showdown";
 import firebase from "firebase/app";
 import { v4 as uuidv4 } from "uuid";
 import {
   Container,
+  Divider,
   Grid,
   TextField,
   TextareaAutosize,
   Button,
-  FilledInput
+  Typography,
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 import Popup from "../Popup";
 
+import Markdown from "../Markdown";
+
 let useStyles = makeStyles({
   create: {
-    marginTop: "20px",
     "& form": {
       display: "flex",
       flexDirection: "column",
-      "& *": {
+      "& > *": {
         margin: "5px 5px"
       }
     }
+  },
+  fileInputLabel: {
+    cursor: 'pointer',
+    backgroundColor: '#0af',
+    color: 'white',
+    padding: '10px',
+    width: '200px',
+    textAlign: 'center',
+    fontSize: '120%',
+    borderRadius: '3px',
+
+    '&:hover': {
+      backgroundColor: '#08a',
+    },
+
+    '& + #images': {
+      width: 0,
+      height: 0,
+      overflow: 'hidden',
+      opacity: 0,
+      position: 'absolute',
+      zIndex: -1,
+    },
+  },
+  previewContainer: {
+    border: '1px solid #999',
+    borderRadius: '5px',
+    minHeight: '70vh',
   }
 });
 
 export default function CreatPost() {
-  const [markInput, changeMark] = useState("Review HTML");
+  const [markInput, changeMark] = useState("");
   const [dialog, setDialog] = useState(false);
   const [series, setSeries] = useState([]);
 
@@ -43,8 +72,6 @@ export default function CreatPost() {
       .collection("series")
       .get()
       .then(data => {
-        console.log("a");
-
         let result = data.docs.map(doc => {
           return {
             ...doc.data(),
@@ -52,7 +79,6 @@ export default function CreatPost() {
           };
         });
         setSeries(result);
-        console.log(result);
       });
   }, []);
 
@@ -66,7 +92,6 @@ export default function CreatPost() {
         idSerie = serie.id;
       }
     });
-    console.log(idSerie);
 
     let fileNames = [];
     for (const file of files) {
@@ -88,7 +113,6 @@ export default function CreatPost() {
         for (let i = 0; i < files.length; i++) {
           storageRef.child(`/blogs/${fileNames[i]}`).put(files[i]);
         }
-        console.log(dataReturn);
         
         updateIdBlogToSeries(dataReturn);
         setDialog(true);
@@ -106,17 +130,18 @@ export default function CreatPost() {
       .then(() => setDialog(true));
   };
   return (
-    <Container>
-      <Grid container>
-        <Grid container xs direction="column" className={classes.create}>
-          <form onSubmit={createPostHandler}>
-            <TextField name="postTitle" label="Tile Post" />
-            <TextField name="openingInput" label="Opening" />
-            <input type="file" name="imageInput" multiple></input>
+    <Container my={3}>
+      <Typography variant="h4" gutterBottom>
+        Create a new post
+      </Typography>
+      <Divider />
 
+      <Grid container spacing={3}>
+        <Grid item xs={5} className={classes.create}>
+          <form onSubmit={createPostHandler}>
             <Autocomplete
-              id="combo-box-demo"
               options={series}
+              freeSolo
               getOptionLabel={option => option.title}
               getOptionSelected={option => option.id}
               style={{ width: 300 }}
@@ -126,22 +151,38 @@ export default function CreatPost() {
                   name="series"
                   label="Series"
                   variant="outlined"
+                  margin="normal"
                 />
               )}
             />
 
-            <TextareaAutosize
-              name="markInput"
+            <TextField name="postTitle" label="Title" />
+            <TextField name="openingInput" label="Opening" />
+
+            <label htmlFor="images" className={classes.fileInputLabel}>
+              Choose images...
+            </label>
+            <input id="images" type="file" name="imageInput" multiple />
+
+                        <TextareaAutosize
               rows="20"
               rowsMax="25"
-              placeholder="MarkDown"
+              placeholder="Blog content"
               onChange={e => changeMark(e.target.value)}
             />
             <Button type="submit">Post</Button>
           </form>
         </Grid>
-        <Grid xs>
-          <Markdown markup={markInput} />
+
+        <Grid item xs={7}>
+          <Typography variant="h5">
+            Preview content
+          </Typography>
+          <div className={classes.previewContainer}>
+            <Markdown>
+             { markInput }
+            </Markdown>
+          </div>
         </Grid>
       </Grid>
       <Popup
