@@ -12,7 +12,7 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import IconButton from '@material-ui/core/IconButton'
 import { Link } from 'react-router-dom'
 import firebase from 'firebase'
-import Popup from '../Popup'
+import Popup from '../components/Popup'
 
 let useStyles = makeStyles({
   root: {
@@ -21,39 +21,83 @@ let useStyles = makeStyles({
 })
 export default function Posts() {
   let classes = useStyles()
-  let db = firebase.firestore()
   const [blogs, setBlogs] = useState([])
   useEffect(()=>{
-    db.collection('blogs').get().then(
-      data =>{
-        let result = data.docs.map(doc =>{
-          return {
-            ...doc.data(),
-            id: doc.id
-          }
-        })
-        let docs = result.map((blog, i) =>
-          <Blog id={blog.id} title={blog.title} key={i} stt={i+1}/>
-        )
-        setBlogs(docs)
-    })
+    let db = firebase.firestore()
+    
+    db.collection('series')
+      .get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          return console.log('No series found');
+        }
+
+        let series = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        series.forEach(s => {
+          db.collection('series')
+            .doc(s.id)
+            .get()
+            .then(doc => {
+              if (!doc.exists) {
+                return console.log('Cannot find series with the id: ' + doc.id);
+              }
+
+              let blogRefs = doc.data().blogs;
+              let seriesTitle = doc.data().title;
+              
+              blogRefs.forEach(ref => {
+                ref.get().then(doc => {
+                  if (!doc.exists) {
+                    return console.log('Cannot find blog with id: ' + doc.id);
+                  }
+
+                  let data = doc.data();
+                  let blog = (
+                    <Blog
+                      key={doc.id}
+                      title={data.title}
+                      series={seriesTitle}
+                    />
+                  );
+
+                  setBlogs((prevState) => [...prevState, blog]);
+
+
+                });
+              })
+            })
+        });
+      });
   }, [])
 
   return (
     <Container className={classes.root}>
       <Paper>
         <Grid container>
-          <Link to='/createblog'>
-            <Button variant='contained' color='primary'>
-              Thêm blog
-            </Button>
-          </Link>
+          <Grid item xs={4} md={6}>
+            <Link to='/createblog'>
+              <Button variant='contained' color='primary'>
+                Add new post
+              </Button>
+            </Link>
+          </Grid>
+          <Grid item xs={4} md={6}>
+            <Link to='/series/new'>
+              <Button variant='contained' color='primary'>
+                Create new series
+              </Button>
+            </Link>
+          </Grid>
         </Grid>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell align='center'>STT</TableCell>
+                <TableCell align='left'>Series</TableCell>
                 <TableCell align='left'>Title</TableCell>
                 <TableCell align='center'>Actions</TableCell>
               </TableRow>
@@ -83,7 +127,7 @@ function Blog(props) {
   }
   return (
     <TableRow>
-      <TableCell align='center'>{props.stt}</TableCell>
+      <TableCell align='left'>{props.series}</TableCell>
       <TableCell align='left'>{props.title}</TableCell>
       <TableCell align='center'>
         <IconButton>

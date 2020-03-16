@@ -1,23 +1,24 @@
 import React from "react";
-import firebase from "firebase";
-import { Tabs, Tab } from "@material-ui/core";
+import { Link } from "react-router-dom";
 import {
-  ListSubheader,
   List,
   ListItem,
   ListItemIcon,
   ListItemText
 } from "@material-ui/core";
+
 import { makeStyles } from "@material-ui/core/styles";
+
 import EventIcon from "@material-ui/icons/Event";
 import CreateIcon from "@material-ui/icons/Create";
 import LogoutIcon from "@material-ui/icons/ExitToApp";
-import HomeIcon from "@material-ui/icons/HomeOutlined";
-import { Link } from "react-router-dom";
+
+import firebase from "firebase";
 
 let useStyle = makeStyles({
   tabs: {
-    backgroundColor: "#dadada"
+    // backgroundColor: "#dadada"
+    borderRight: '1px solid #aaa',
   }
 });
 
@@ -33,19 +34,7 @@ export default function VerticalTabs(props) {
   };
   return (
     <List component="nav" className={classes.tabs}>
-      <Link style={{ textDecoration: "none", color: "black" }} to="/">
-        <ListItem
-          button
-          selected={selectedIndex === 0}
-          onClick={event => handleListItemClick(event, 0)}
-        >
-          <ListItemIcon>
-            <HomeIcon />
-          </ListItemIcon>
-          <ListItemText primary="Home" />
-        </ListItem>
-      </Link>
-      <Link style={{ textDecoration: "none", color: "black" }} to="/blogs">
+      <Link style={{ textDecoration: "none", color: "black" }} to="/blog">
         <ListItem
           button
           selected={selectedIndex === 1}
@@ -54,7 +43,7 @@ export default function VerticalTabs(props) {
           <ListItemIcon>
             <CreateIcon />
           </ListItemIcon>
-          <ListItemText primary="Blogs" />
+          <ListItemText primary="Blog" />
         </ListItem>
       </Link>
       <Link style={{ textDecoration: "none", color: "black" }} to="/events">
@@ -76,14 +65,5 @@ export default function VerticalTabs(props) {
         <ListItemText primary="Logout" />
       </ListItem>
     </List>
-    // <Tabs orientation='vertical' className={props.style}>
-    //   <Link to='/posts'>
-    //     <Tab icon={<CreateIcon/>} label='Posts' />
-    //   </Link>
-    //   <Link to='events'>
-    //     <Tab label='Events'>
-    //     </Tab>
-    //   </Link>
-    // </Tabs>
   );
 }

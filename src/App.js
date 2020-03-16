@@ -1,9 +1,9 @@
-import React,{Component} from 'react'
-import firebase from 'firebase/app'
+import React,{Component} from 'react';
+import firebase from 'firebase/app';
 
-import Login from './templates/Login'
-import Admin from './templates/Admin'
-import "./App.css"
+import Login from './layouts/Login';
+import Admin from './layouts/Admin';
+import "./App.css";
 
 
 
@@ -11,7 +11,7 @@ class App extends Component {
   constructor(){
     super()
     this.state = {
-      currentPage : ''
+      currentPage : null,
     }
   }
   componentDidMount(){
@@ -20,7 +20,7 @@ class App extends Component {
         this.setState({
           currentPage: <Admin/>
         })
-      }else{
+      } else {
         this.setState({
           currentPage: <Login/>
         })

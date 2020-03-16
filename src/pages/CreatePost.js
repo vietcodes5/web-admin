@@ -10,11 +10,12 @@ import {
   Button,
   Typography,
 } from "@material-ui/core";
+
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
-import Popup from "../Popup";
 
-import Markdown from "../Markdown";
+import Popup from "../components/Popup";
+import Markdown from "../components/Markdown";
 
 let useStyles = makeStyles({
   create: {
@@ -50,16 +51,21 @@ let useStyles = makeStyles({
     },
   },
   previewContainer: {
+    padding: '5px 10px',
     border: '1px solid #999',
     borderRadius: '5px',
     minHeight: '70vh',
+  },
+  contentInput: {
+    padding: '5px 10px',
   }
 });
 
 export default function CreatPost() {
-  const [markInput, changeMark] = useState("");
-  const [dialog, setDialog] = useState(false);
-  const [series, setSeries] = useState([]);
+  const [ markInput, changeMark ] = useState("");
+  const [ dialog, setDialog ] = useState(false);
+  const [ series, setSeries ] = useState([]);
+  const [ files, setFiles ] = useState([]);
 
   let classes = useStyles();
   let storage = firebase.storage();
@@ -84,8 +90,8 @@ export default function CreatPost() {
 
   let createPostHandler = e => {
     e.preventDefault();
-    let files = e.target.imageInput.files;
     let serieName = e.target.series.value;
+
     if (!serieName) return;
     series.forEach(serie => {
       if (serie.title === serieName) {
@@ -93,10 +99,8 @@ export default function CreatPost() {
       }
     });
 
-    let fileNames = [];
-    for (const file of files) {
-      fileNames.push(uuidv4());
-    }
+    // create random file names
+    let fileNames = Object.keys(files).map(() => uuidv4());
     let data = {
       title: e.target.postTitle.value,
       opening: e.target.openingInput.value,
@@ -105,6 +109,7 @@ export default function CreatPost() {
       photos: fileNames,
       author: firebase.auth().currentUser.email
     };
+
     firebase
       .firestore()
       .collection("blogs")
@@ -113,7 +118,7 @@ export default function CreatPost() {
         for (let i = 0; i < files.length; i++) {
           storageRef.child(`/blogs/${fileNames[i]}`).put(files[i]);
         }
-        
+
         updateIdBlogToSeries(dataReturn);
         setDialog(true);
       })
@@ -129,8 +134,9 @@ export default function CreatPost() {
       })
       .then(() => setDialog(true));
   };
+
   return (
-    <Container my={3}>
+    <Container>
       <Typography variant="h4" gutterBottom>
         Create a new post
       </Typography>
@@ -138,6 +144,12 @@ export default function CreatPost() {
 
       <Grid container spacing={3}>
         <Grid item xs={5} className={classes.create}>
+          <Typography variant="body1">
+            Note: for anyone not knowing Markdown: 
+            <a href="http://markdownguide.org/cheat-sheet" target="_blank" rel="noopener noreferrer">
+              Markdown Cheat Sheet
+            </a>
+          </Typography>
           <form onSubmit={createPostHandler}>
             <Autocomplete
               options={series}
@@ -159,17 +171,26 @@ export default function CreatPost() {
             <TextField name="postTitle" label="Title" />
             <TextField name="openingInput" label="Opening" />
 
-            <label htmlFor="images" className={classes.fileInputLabel}>
-              Choose images...
-            </label>
-            <input id="images" type="file" name="imageInput" multiple />
-
-                        <TextareaAutosize
+            
+            <TextareaAutosize
               rows="20"
               rowsMax="25"
               placeholder="Blog content"
+              className={classes.contentInput}
               onChange={e => changeMark(e.target.value)}
             />
+
+            <label htmlFor="images" className={classes.fileInputLabel}>
+              Choose images...
+            </label>
+            <input 
+              id="images" 
+              type="file" 
+              name="imageInput" 
+              onChange={e => setFiles(e.target.files)}
+              multiple 
+             />
+            
             <Button type="submit">Post</Button>
           </form>
         </Grid>
@@ -183,6 +204,13 @@ export default function CreatPost() {
              { markInput }
             </Markdown>
           </div>
+
+          <Typography variant="body2">
+            Chosen images: 
+            <ul>
+              { Object.keys(files).map(index => <li key={files[index].name}>{ files[index].name }</li> ) }
+            </ul>
+          </Typography>
         </Grid>
       </Grid>
       <Popup

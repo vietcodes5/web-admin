@@ -19,7 +19,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import IconButton from "@material-ui/core/IconButton";
-import Popup from "../Popup";
+import Popup from "../components/Popup";
+
 let useStyles = makeStyles({
   root: {
     paddingTop: "24px"

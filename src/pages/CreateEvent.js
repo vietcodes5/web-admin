@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Markdown } from 'react-showdown'
+
 import firebase from 'firebase/app'
-import {Link} from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
 
 import {
@@ -10,9 +10,12 @@ import {
   TextField,
   TextareaAutosize,
   Button,
-} from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import Popup from '../Popup'
+} from '@material-ui/core';
+
+import { makeStyles } from '@material-ui/core/styles';
+
+import Popup from '../components/Popup';
+import InputFile from '../components/InputFile';
 
 let useStyles = makeStyles({
   create: {
@@ -28,8 +31,8 @@ let useStyles = makeStyles({
 })
 
 export default function CreatPost() {
-const [ markInput, changeMark ] = useState('Review HTML')
-  const [ dialog, setDialog ] = useState(false)
+  const [markInput, changeMark] = useState('Review HTML')
+  const [dialog, setDialog] = useState(false)
   let classes = useStyles()
   let storage = firebase.storage()
   let storageRef = storage.ref()
@@ -37,7 +40,7 @@ const [ markInput, changeMark ] = useState('Review HTML')
     let a = string.split('.')
     return a[a.length - 1]
   }
-  
+
   let createPostHandler = e => {
     e.preventDefault()
     let files = e.target.imageInput.files
@@ -57,7 +60,7 @@ const [ markInput, changeMark ] = useState('Review HTML')
       photos: fileNames,
       main_photos: {
         square: nameSquare,
-        rect : nameRect
+        rect: nameRect
       },
     }
     firebase
@@ -67,24 +70,24 @@ const [ markInput, changeMark ] = useState('Review HTML')
       .then(() => {
         storageRef.child(`/events/${nameSquare}`).put(fileSquare)
         storageRef.child(`/events/${nameRect}`).put(fileRect)
-        for (let i = 0 ; i < files.length; i++){
+        for (let i = 0; i < files.length; i++) {
           storageRef.child(`/events/${fileNames[i]}`).put(files[i])
         }
       })
       .then(() => setDialog(true))
       .catch(err => console.log(err))
-    }
-  
-    
+  }
+
+
   return (
     <Container>
       <Grid container>
         <Grid container xs direction='column' className={classes.create}>
           <form onSubmit={createPostHandler}>
             <TextField name='eventTitle' label='Title Event' />
-            <input type='file' name='imageInput' multiple></input>
-            <input type='file' name='imageSquare' ></input>
-            <input type='file' name='imageRect' ></input>
+            <InputFile name='imageInput' multiple={true} label="Chọn ảnh cho event" />
+            <InputFile name='imageSquare' multiple={false} label="Ảnh Square" />
+            <InputFile name='imageRect' multiple={false} label="Ảnh Rect" />
             <TextareaAutosize
               name='markInput'
               rows='20'
@@ -100,49 +103,7 @@ const [ markInput, changeMark ] = useState('Review HTML')
           <Markdown markup={markInput} />
         </Grid>
       </Grid>
-      <Popup show={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} direction="/events"/>
+      <Popup show={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} direction="/events" />
     </Container>
   )
 }
-
-
-
-// let a = [ 
-//   {
-//     title: tung,
-//     name: mac
-//   },
-//   {
-//     title: tung1,
-//     name: mac
-//   },
-//   {
-//     title: tung2,
-//     name: mac
-//   }
-// ]
-// let b = [
-//   {
-//     title: tung2,
-//     name: mac,
-//     age: 10
-//   },
-//   {
-//     title: tung4,
-//     name: mac,
-//     age: 10
-//   } 
-// ]
-// function find(arr, title) {
-//   let ans = -1;
-//   arr.forEach((item, i) => ans = (item.title === title) ? i : ans);
-// }
-
-// function merge(arr1, arr2) {
-//   arr1.forEach((item, i) => {
-//     let index = find(arr2, item.title);
-//     if (index !== -1) {
-//       arr1[i] = arr2[index];
-//     }
-//   });
-// }
