@@ -1,10 +1,13 @@
 import React,{Component} from 'react';
+
+import { ThemeProvider } from '@material-ui/core/styles';
+import theme from './theme';
+
 import firebase from 'firebase/app';
 
 import Login from './layouts/Login';
 import Admin from './layouts/Admin';
 import "./App.css";
-
 
 
 class App extends Component {
@@ -16,7 +19,7 @@ class App extends Component {
   }
   componentDidMount(){
     firebase.auth().onAuthStateChanged((user)=>{
-      if(user){
+      if (user){
         this.setState({
           currentPage: <Admin/>
         })
@@ -29,9 +32,9 @@ class App extends Component {
   }
   render(){
     return (
-      <div>
+      <ThemeProvider theme={theme}>
         {this.state.currentPage}
-      </div>
+      </ThemeProvider>
     )
   }
 }

@@ -1,7 +1,10 @@
 import React from 'react';
 
-import { AppBar, Toolbar, Typography, IconButton } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu'
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+} from '@material-ui/core';
 
 import firebase from 'firebase';
 import 'firebase/auth';
@@ -10,7 +13,7 @@ export default function Header() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h5" style={{ flexGrow: 1 }}>
+        <Typography variant="h2" style={{ flexGrow: 1 }}>
           Admin Vietcode
         </Typography>
 
