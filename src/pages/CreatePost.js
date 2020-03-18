@@ -58,6 +58,8 @@ let useStyles = makeStyles({
   },
   contentInput: {
     padding: '5px 10px',
+    fontFamily: 'Roboto',
+    fontSize: '14px',
   }
 });
 

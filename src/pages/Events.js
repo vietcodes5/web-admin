@@ -13,7 +13,8 @@ import {
   TableCell,
   TableBody,
   TableFooter,
-  Button
+  Button,
+  Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import EditIcon from "@material-ui/icons/Edit";
@@ -24,18 +25,19 @@ import Popup from "../components/Popup";
 let useStyles = makeStyles({
   root: {
     paddingTop: "24px"
+  },
+  button: {
+    marginBottom: '10px', 
+    '&:hover': {
+      backgroundColor: '#36ed4e'
+    }
   }
 });
 
 export default function Events() {
   let classes = useStyles();
   let db = firebase.firestore();
-  let [events, setEvents] = useState([]);
-  firebase
-    .database()
-    .ref()
-    .child("events")
-    .on("value", snap => console.log("snap", snap.val()));
+  let [ events, setEvents ] = useState([]);
 
   useEffect(() => {
     db.collection("events")
@@ -47,24 +49,31 @@ export default function Events() {
             id: doc.id
           };
         });
-        console.log(result);
 
         let docs = result.map((event, i) => (
-          <Event title={event.title} stt={i + 1} key={i} id={event.id} setEvent={setEvents} ></Event>
+          <Event 
+            title={event.title} 
+            stt={i + 1} 
+            key={i} 
+            id={event.id} 
+            setEvent={setEvents} />
         ));
 
         setEvents(docs);
       })
       .catch(err => console.log(err));
-  }, []);
+  }, [ db ]);
   return (
     <Container className={classes.root}>
+      <Typography variant="h1" gutterBottom>
+        Events
+      </Typography>
+      <Link to="/createevent">
+        <Button variant="contained" className={classes.button}>
+          Create new event
+        </Button>
+      </Link>
       <Paper>
-        <Link to="/createevent">
-          <Button variant="contained" color="primary">
-            Thêm event
-          </Button>
-        </Link>
         <TableContainer>
           <Table>
             <TableHead>
@@ -86,7 +95,7 @@ export default function Events() {
 }
 
 function Event(props) {
-  const [dialog, setDialog] = useState(false);
+  const [ dialog, setDialog ] = useState(false);
   let deleteEvent = () => {
     firebase
       .firestore()
