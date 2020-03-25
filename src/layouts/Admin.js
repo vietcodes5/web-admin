@@ -13,10 +13,10 @@ export default function Admin() {
     <Router>
       <Header />
       <Grid container>
-        <Grid xs={2}>
+        <Grid item xs={2}>
           <VerticalTabs />
         </Grid>
-        <Grid xs={10}>
+        <Grid item xs={10}>
           <Content />
         </Grid>
       </Grid>

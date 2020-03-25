@@ -64,7 +64,9 @@ let useStyles = makeStyles({
 });
 
 export default function CreatPost() {
-  const [ markInput, changeMark ] = useState("");
+  const [ content, updateContent ] = useState("");
+  const [ title, updateTitle ] = useState("");
+  const [ opening, updateOpening ] = useState("");
   const [ dialog, setDialog ] = useState(false);
   const [ series, setSeries ] = useState([]);
   const [ files, setFiles ] = useState([]);
@@ -104,9 +106,9 @@ export default function CreatPost() {
     // create random file names
     let fileNames = Object.keys(files).map(() => uuidv4());
     let data = {
-      title: e.target.postTitle.value,
-      opening: e.target.openingInput.value,
-      content: e.target.markInput.value,
+      title,
+      opening,
+      content,
       createdAt: new Date().toISOString(),
       photos: fileNames,
       author: firebase.auth().currentUser.email
@@ -114,11 +116,11 @@ export default function CreatPost() {
 
     firebase
       .firestore()
-      .collection("blogs")
+      .collection("posts")
       .add(data)
       .then((dataReturn) => {
         for (let i = 0; i < files.length; i++) {
-          storageRef.child(`/blogs/${fileNames[i]}`).put(files[i]);
+          storageRef.child(`/blog/${fileNames[i]}`).put(files[i]);
         }
 
         updateIdBlogToSeries(dataReturn);
@@ -148,7 +150,9 @@ export default function CreatPost() {
         <Grid item xs={5} className={classes.create}>
           <Typography variant="body1">
             Note: for anyone not knowing Markdown: 
-            <a href="http://markdownguide.org/cheat-sheet" target="_blank" rel="noopener noreferrer">
+            <a 
+              href="http://markdownguide.org/cheat-sheet" 
+              target="_blank" rel="noopener noreferrer">
               Markdown Cheat Sheet
             </a>
           </Typography>
@@ -170,16 +174,32 @@ export default function CreatPost() {
               )}
             />
 
-            <TextField name="postTitle" label="Title" />
-            <TextField name="openingInput" label="Opening" />
-
+            <TextField 
+              label="Title" 
+              value={title}
+              onChange={(e) => { 
+                e.persist(); 
+                updateTitle(() => e.target.value );
+              }}
+            />
+            <TextField 
+              label="Opening" 
+              value={opening}
+              onChange={(e) => { 
+                e.persist(); 
+                updateOpening(() => e.target.value );
+              }}
+            />
             
             <TextareaAutosize
               rows="20"
               rowsMax="25"
               placeholder="Blog content"
               className={classes.contentInput}
-              onChange={e => changeMark(e.target.value)}
+              onChange={(e) => { 
+                e.persist(); 
+                updateContent(() => e.target.value );
+              }}
             />
 
             <label htmlFor="images" className={classes.fileInputLabel}>
@@ -203,7 +223,7 @@ export default function CreatPost() {
           </Typography>
           <div className={classes.previewContainer}>
             <Markdown>
-             { markInput }
+             { content }
             </Markdown>
           </div>
 

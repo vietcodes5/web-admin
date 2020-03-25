@@ -33,7 +33,7 @@ class App extends Component {
   render(){
     return (
       <ThemeProvider theme={theme}>
-        {this.state.currentPage}
+        { this.state.currentPage || <></> }
       </ThemeProvider>
     )
   }
