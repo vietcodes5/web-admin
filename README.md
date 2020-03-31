@@ -1,68 +1,113 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Hướng dẫn cài đặt
+======================
+###### by @tiuphun 🐱‍💻
+Các bước cài đặt để bắt đầu build và phát triển project. 
+*Chỉ thay ```npm ``` bằng ```yarn```*
 
-## Available Scripts
+Clone
+-------------------
 
-In the project directory, you can run:
+Cách làm:
 
-### `yarn start`
+1. Đi đến nơi có repo muốn clone trên trình duyệt
+Ví dụ: https://github.com/vietcodes5/web
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+2. Tìm tới nút màu xanh bên phải màn hình "Clone or Download".
+Từ đó sẽ có một hộp thoại "Clone with HTTPS" và địa chỉ tương ứng.
+Copy địa chỉ đó.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+3. Mở terminal (với MacOS và các Linux distro, riêng Windows có tên "Windows PowerShell")
+Gõ lệnh:
+git clone {paste địa chỉ vừa copy tại đây}
 
-### `yarn test`
+4. Để xem danh sách file đã clone về, gõ lệnh:
+ls {tên repo vừa clone}
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+*Tham khảo: https://opensource.com/article/18/2/how-clone-modify-add-delete-git-files*
 
-### `yarn build`
+Cài Node
+--------------------------
+1. Windows: lên trang https://nodejs.org/en/download/ và làm theo hướng dẫn.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. MacOS và distro Linux: Sử dụng nvm (Node Version Manager) để cài - Làm theo hướng dẫn tại https://www.taniarascia.com/how-to-install-and-use-node-js-and-npm-mac-and-windows/#install-nodejs-and-npm-1
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+*Tham khảo: https://www.taniarascia.com/how-to-install-and-use-node-js-and-npm-mac-and-windows/*
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Cài đặt các dependencies :book:
+------------------------------
+Dependencies là các thư viện mà sản phẩm của mình sẽ cần đến, không có thì không chạy được.
 
-### `yarn eject`
+Chạy lệnh:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```npm install``` hoặc ```yarn add```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Chek version yarn hiện tại trên máy:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```shell
+yarn --version
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Khởi chạy :rocket:
+---------------------------
+Mở thư mục chứa repo vừa clone về trong terminal và thực hiện các lệnh:
 
-## Learn More
+```shell
+yarn start
+```
+Mở ứng dụng trong mode phát triển.
+Sau đó mở địa chỉ http://localhost:3000/ trong trình duyệt để xem ứng dụng đó.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```shell
+yarn test
+```
+Khởi chạy test trong mode tương tác.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```shell
+yarn build
+```
+Gộp và xây dựng project React vào trong folder 'build'
+Ứng dụng khi đó sẽ sẵn sàng để deploy!
 
-### Code Splitting
+```shell
+yarn eject
+```
+#### DANGER ZONE !! 💥
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Nếu như không hài lòng với toàn bộ tất cả những cài đặt và build, chúng ta có thể xóa nó với lệnh trên. Tuy vậy các cài đặt họ đã để phù hợp hết rồi, vì vậy chúng ta sẽ không bao giờ phải dùng tới lệnh này.
 
-### Analyzing the Bundle Size
+Các bước đóng góp code :computer:
+==============================
+*Tuân thủ theo quy tắc GitHub Flow: https://guides.github.com/introduction/flow/*
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+Dưới đây là tóm tắt:
 
-### Making a Progressive Web App
+### Nhận issue
+Trước khi làm bất cứ thứ gì thì hãy báo với mọi người là mình đang làm phần nào đó. Vì thế việc nhận issue sẽ giúp project manager biết ai đang làm phần nào và giúp mọi người không nhận nhầm việc của nhau.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+### Tạo branch
+Khi bắt đầu làm project sẽ có một branch gốc tên 'master'. Đây là branch quan trọng nhất, chỉ được thay đổi khi project đã hoàn thiện một cách đẹp đẽ và sạch sẽ.
 
-### Advanced Configuration
+Vì thế khi bắt đầu dev chúng ta sẽ tạo một branch khác. Giống như một quyển vở nháp, mọi thứ build sau này chúng ta sẽ đưa lên branch này để kiểm duyệt.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+Chỉ tới khi cuối cùng tất cả mọi thứ xong, no bug, lung linh, thì ta mới gộp 2 branch vào với nhau - giống như copy đáp án từ quyển nháp vào tờ giấy trả lời trắc nghiệm vậy.
 
-### Deployment
+### Commits
+Commits là những thay đổi mà chúng ta tạo ra trong quá trình build. Nó cũng có thể được lưu lại như là lịch sử xây dựng project. 
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+Hãy viết commit messages rõ ràng và dễ hiểu để người khác hiểu bạn đang thay đổi cái gì.
 
-### `yarn build` fails to minify
+### Pull Request
+Pull request là khi bạn muốn đưa thay đổi của mình vào branch thông qua thảo luận với người trong team. Hãy viết code thật chỉn chu rồi mới mở pull request. Viết tin nhắn trong pull request rõ ràng để người khác có thể bàn luận với bạn. 
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Hãy bàn thảo và review code kĩ trước khi chấp nhận một pull request nào đó.
+
+### Deploy
+Sau quá trình dài dev, mọi thứ với branch "nháp" mà chúng ta khởi tạo đã xong. Hãy deploy nó để check lỗi và đưa ra thay đổi cần thiết. Phải thật cẩn thận, và chắc chắn là không mắc sai sót gì nữa.
+
+### Merge và kết thúc
+Bây giờ đã xong quá trình build dự án, chúng ta sẽ gộp branch "nháp" với branch master ban đầu, và cho ra sản phẩm cuối cùng.
+
+
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). ❤
+
