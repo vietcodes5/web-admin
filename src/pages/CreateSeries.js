@@ -214,7 +214,7 @@ export default function CreateSeries(props) {
             rect: rectImageName,
             square: squareImageName,
           },
-          blogs: []
+          posts: []
         };    
 
         db.collection('series')
