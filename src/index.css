@@ -16,3 +16,8 @@ code {
 a {
   text-decoration: none;
 }
+
+a:visited,
+a:link {
+  color: inherit;
+}
