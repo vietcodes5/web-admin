@@ -1,24 +1,27 @@
 import React,{useState, useEffect} from 'react'
+import { Link } from 'react-router-dom'
 import { 
   Container, 
   Grid, 
   Button, 
   Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableFooter,
   Typography,
 } from '@material-ui/core'
+import TreeView from '@material-ui/lab/TreeView'
+import TreeItem from '@material-ui/lab/TreeItem'
+
 import { makeStyles } from '@material-ui/core/styles'
+
+import Popup from '../components/Popup'
+
 import EditIcon from '@material-ui/icons/Edit'
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import IconButton from '@material-ui/core/IconButton'
-import { Link } from 'react-router-dom'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+
 import firebase from 'firebase'
-import Popup from '../components/Popup'
+import 'firebase/firestore'
 
 let useStyles = makeStyles(theme => ({
   root: {
@@ -30,14 +33,28 @@ let useStyles = makeStyles(theme => ({
     '&:hover': {
       backgroundColor: '#36ed4e',
     }
+  },
+  treeView: {
+    minHeight: '216px',
+    flexGrow: 1,
+  },
+  treeItemSeries: {
+    padding: '10px',
+    fontSize: '40px'
   }
 }));
 
 export default function Posts() {
   let classes = useStyles()
-  const [blogs, setBlogs] = useState([])
+  const [ treeNodes, updateTreeNodes ] = useState([]);
+  const [ expanded, setExpanded ] = useState([]);
+  const [ selected, setSelected ] = useState([]);
+
+  const handleToggle = (e, nodeIds) => setExpanded(nodeIds);
+  const handleSelect = (e, nodeIds) => setSelected(nodeIds);
+
   useEffect(()=>{
-    let db = firebase.firestore()
+    const db = firebase.firestore()
     
     db.collection('series')
       .get()
@@ -46,42 +63,53 @@ export default function Posts() {
           return console.log('No series found');
         }
 
-        let series = snapshot.docs.map(doc => ({
+        let allSeries = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
 
-        series.forEach(s => {
-          db.collection('series')
-            .doc(s.id)
-            .get()
-            .then(doc => {
-              if (!doc.exists) {
-                return console.log('Cannot find series with the id: ' + doc.id);
-              }
+        allSeries.forEach(s => {
+          const postRefs = s.posts;
+          const promises = postRefs.map(ref => ref.get());
 
-              let blogRefs = doc.data().blogs;
-              let seriesTitle = doc.data().title;
-              
-              blogRefs.forEach(ref => {
-                ref.get().then(doc => {
-                  if (!doc.exists) {
-                    return console.log('Cannot find blog with id: ' + doc.id);
-                  }
+          Promise.all(promises)
+            .then(postDocs => {
+              const posts = [];
 
-                  let data = doc.data();
-                  let blog = (
-                    <Blog
-                      key={doc.id}
-                      title={data.title}
-                      series={seriesTitle}
-                    />
-                  );
-
-                  setBlogs((prevState) => [...prevState, blog]);
+              postDocs.forEach(postDoc => {
+                posts.push({
+                  id: postDoc.id,
+                  ...postDoc.data()
                 });
-              })
+              });
+
+              const postNodes = posts.map(post => (
+                <TreeItem 
+                  key={post.id} 
+                  nodeId={post.id} 
+                  label={
+                    <Link to={`/series/${s.id}/${post.id}`}>
+                      <Typography variant="h4">{post.title}</Typography>
+                    </Link>
+                  } />
+              ));
+              const SeriesNode = (
+                <TreeItem 
+                  className={classes.treeItemSeries} 
+                  key={s.id} 
+                  nodeId={s.id} 
+                  label={
+                    <Link to={`/series/${s.id}`}>
+                      <Typography variant="h3">{s.title}</Typography>
+                    </Link>
+                  }>
+                { postNodes }
+                </TreeItem>
+              );
+
+              updateTreeNodes(prevState => [ ...prevState, SeriesNode ]);
             })
+            .catch(console.log);
         });
       });
   }, []);
@@ -108,57 +136,19 @@ export default function Posts() {
         </Grid>
       </Grid>
       <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell align='left'>Series</TableCell>
-              <TableCell align='left'>Title</TableCell>
-              <TableCell align='center'>Actions</TableCell>
-             </TableRow>
-          </TableHead>
-          <TableBody>{blogs}</TableBody>
-          <TableFooter>
-            {/* <TablePagination rowsPerPage={5} page={1} count={100} ></TablePagination> */}
-          </TableFooter>
-        </Table>
+        <TreeView
+          className={classes.treeView}
+          defaultCollapseIcon={<ExpandMoreIcon />}
+          defaultExpandIcon={<ChevronRightIcon />}
+          expanded={expanded}
+          selected={selected}
+          onNodeToggle={handleToggle}
+          onNodeSelect={handleSelect}
+        >
+        { Array.isArray(treeNodes) && treeNodes.length ? treeNodes : "Loading data..." }
+        </TreeView>
       </Paper>
     </Container>
   );
 }
 
-function Blog(props) {
-  const [dialog, setDialog] = useState(false);
-
-  let deleteEvent = ()=>{
-    firebase.firestore()
-    .collection('blogs')
-    .doc(props.id)
-    .delete()
-    .then(()=> {
-      setDialog(false);
-    })
-    .catch((err)=> console.log(err))
-  }
-  return (
-    <TableRow>
-      <TableCell align='left'>{props.series}</TableCell>
-      <TableCell align='left'>{props.title}</TableCell>
-      <TableCell align='center'>
-        <IconButton>
-          <EditIcon />
-        </IconButton>
-        <IconButton onClick={() => setDialog(true)}>
-          <DeleteOutlineIcon />
-        </IconButton>
-      </TableCell>
-      <Popup
-        direction = '/blogs'
-        content="Bạn có chắc chắn muốn xoá ?"
-        updatePopup={setDialog}
-        show={dialog}
-        btnConfirm="Xoá"
-        btnConfirmAction={deleteEvent}
-      />
-    </TableRow>
-  )
-}

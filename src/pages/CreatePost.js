@@ -134,7 +134,7 @@ export default function CreatPost() {
       .collection("series")
       .doc(idSerie)
       .update({
-        blogs: firebase.firestore.FieldValue.arrayUnion(data)
+        posts: firebase.firestore.FieldValue.arrayUnion(data)
       })
       .then(() => setDialog(true));
   };
@@ -229,10 +229,10 @@ export default function CreatPost() {
 
           <Typography variant="body2">
             Chosen images: 
-            <ul>
-              { Object.keys(files).map(index => <li key={files[index].name}>{ files[index].name }</li> ) }
-            </ul>
           </Typography>
+          <ul>
+            { Object.keys(files).map(index => <li key={files[index].name}>{ files[index].name }</li> ) }
+          </ul>
         </Grid>
       </Grid>
       <Popup
