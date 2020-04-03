@@ -67,6 +67,7 @@ export default function Posts() {
           id: doc.id,
           ...doc.data()
         }));
+        // console.log(allSeries);
 
         allSeries.forEach(s => {
           const postRefs = s.posts;
