@@ -11,12 +11,6 @@ import TreeView from '@material-ui/lab/TreeView'
 import TreeItem from '@material-ui/lab/TreeItem'
 
 import { makeStyles } from '@material-ui/core/styles'
-
-import Popup from '../components/Popup'
-
-import EditIcon from '@material-ui/icons/Edit'
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
-import IconButton from '@material-ui/core/IconButton'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 
@@ -38,10 +32,6 @@ let useStyles = makeStyles(theme => ({
     minHeight: '216px',
     flexGrow: 1,
   },
-  treeItemSeries: {
-    padding: '10px',
-    fontSize: '40px'
-  }
 }));
 
 export default function Posts() {
@@ -96,7 +86,8 @@ export default function Posts() {
               ));
               const SeriesNode = (
                 <TreeItem 
-                  className={classes.treeItemSeries} 
+                  // 
+                  style={{padding:'10px', fontSize: '40px'}}
                   key={s.id} 
                   nodeId={s.id} 
                   label={
