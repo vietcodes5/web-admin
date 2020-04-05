@@ -1,5 +1,4 @@
 import React from "react";
-import {Link} from 'react-router-dom'
 
 
 import {
@@ -7,21 +6,21 @@ import {
   DialogContent,
   Dialog,
   DialogActions,
-  DialogContentText
 } from "@material-ui/core";
 
 export default function Popup (props) {
+  // const [open , setOpen ] = useState(false)
   return (
-    <Dialog open={props.show}>
+    <Dialog open={props.open}
+        fullWidth={props.fullWidth}
+        maxWidth={props.maxWidth}>
       <DialogContent>
-        <DialogContentText>{props.content}</DialogContentText>
+        {props.content}
       </DialogContent>
       <DialogActions>
-        <Link to={props.direction}>
           <Button onClick={() => props.updatePopup(false)} color="primary">
               Đóng
           </Button>
-        </Link>
         {
           props.btnConfirm &&
           <Button onClick={() => props.btnConfirmAction()}>

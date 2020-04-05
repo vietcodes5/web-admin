@@ -236,7 +236,7 @@ export default function CreatPost() {
         </Grid>
       </Grid>
       <Popup
-        show={dialog}
+        open={dialog}
         content="Blog mới Đã được tạo"
         updatePopup={setDialog}
         direction="/posts"

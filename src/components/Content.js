@@ -16,7 +16,7 @@ import Event from '../templates/Event';
 
 export default function Content() {
   return (
-    <Container style={{ marginTop: '20px' }}>
+    <Container maxWidth="xl" style={{ marginTop: '20px' }}>
       <Switch>
         {/* <Route path='/' component={Home} /> */}
         <Route path='/createblog' component={CreatePost} />
