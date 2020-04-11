@@ -11,6 +11,8 @@ import {
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import PreviewSeries from './PreviewSeries'
+
 import firebase from 'firebase';
 import 'firebase/storage';
 import 'firebase/firestore';
@@ -52,17 +54,6 @@ const useStyles = makeStyles(theme => ({
       position: 'absolute',
       zIndex: -1,
     },
-  },
-  previewRectImg: {
-    display: 'block',
-    maxWidth: '100%',
-    maxHeight: '400px',
-    margin: '0 auto',
-  },
-  previewSquareImg: {
-    display: 'block',
-    width: '60%',
-    margin: '10px auto',
   }
 }));
 
@@ -76,11 +67,11 @@ const defaultValues = {
 }
 
 export default function CreateSeries(props) {
-  const [ newSeries, updateNewSeries ] = useState(defaultValues);
+  const [newSeries, updateNewSeries] = useState(defaultValues);
   const classes = useStyles();
 
   return (
-    <>
+    <Container>
       <Typography variant="h1" gutterBottom>
         Create new Series
       </Typography>
@@ -92,12 +83,12 @@ export default function CreateSeries(props) {
             Details
           </Typography>
 
-          <form 
-            className={classes.form} 
+          <form
+            className={classes.form}
             onSubmit={handleFormSubmit}
           >
             <div>
-              <TextField 
+              <TextField
                 fullWidth
                 label="Series title"
                 variant="outlined"
@@ -120,35 +111,36 @@ export default function CreateSeries(props) {
               />
             </div>
 
-            <div style={{ 
-              display: 'flex', 
-              flexFlow: 'wrap row', 
-              justifyContent: 'space-between' }}>
+            <div style={{
+              display: 'flex',
+              flexFlow: 'wrap row',
+              justifyContent: 'space-between'
+            }}>
               <div style={{ display: 'inline-block', margin: '5px 0' }}>
-                <label 
-                  className={classes.fileInputLabel} 
+                <label
+                  className={classes.fileInputLabel}
                   htmlFor="rect_image">
                   Rectangle cover image
                 </label>
                 <input
                   id="rect_image"
                   onChange={handleImageChange}
-                  type="file" 
-                  name="rect" 
+                  type="file"
+                  name="rect"
                   required />
               </div>
 
               <div style={{ display: 'inline-block', margin: '5px 0' }}>
                 <label
-                  className={classes.fileInputLabel} 
+                  className={classes.fileInputLabel}
                   htmlFor="square_image">
                   Square cover image
                 </label>
                 <input
                   id="square_image"
                   onChange={handleImageChange}
-                  type="file" 
-                  name="square" 
+                  type="file"
+                  name="square"
                   required />
               </div>
             </div>
@@ -161,13 +153,15 @@ export default function CreateSeries(props) {
           </form>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Preview 
+          <PreviewSeries
+            editing={false}
+            currentSeries={newSeries}
             squareImg={newSeries.cover_image.square}
             rectImg={newSeries.cover_image.rect}
           />
         </Grid>
       </Grid>
-    </>
+    </Container>
   );
 
   function handleImageChange(e) {
@@ -177,7 +171,7 @@ export default function CreateSeries(props) {
       ...prevState,
       cover_image: {
         ...prevState.cover_image,
-        [ e.target.name ]: e.target.files[0]
+        [e.target.name]: e.target.files[0]
       }
     }));
   }
@@ -187,7 +181,7 @@ export default function CreateSeries(props) {
 
     updateNewSeries(prevState => ({
       ...prevState,
-      [ e.target.name ]: e.target.value
+      [e.target.name]: e.target.value
     }));
   }
 
@@ -196,7 +190,7 @@ export default function CreateSeries(props) {
 
     const db = firebase.firestore();
     const storageRef = firebase.storage().ref();
-    
+
     const promises = [
       storageRef.child(`/blog/${uuidv4()}`).put(newSeries.cover_image.rect),
       storageRef.child(`/blog/${uuidv4()}`).put(newSeries.cover_image.square),
@@ -206,7 +200,7 @@ export default function CreateSeries(props) {
       .all(promises)
       .then((data) => {
         const rectImageName = data[0].metadata.name,
-              squareImageName = data[1].metadata.name;
+          squareImageName = data[1].metadata.name;
 
         const newSeriesData = {
           ...newSeries,
@@ -215,7 +209,7 @@ export default function CreateSeries(props) {
             square: squareImageName,
           },
           posts: []
-        };    
+        };
 
         db.collection('series')
           .add(newSeriesData)
@@ -229,30 +223,4 @@ export default function CreateSeries(props) {
   }
 }
 
-function Preview(props) {
-  const classes = useStyles();
-  const squareImgSrc = props.squareImg == null ? "" : URL.createObjectURL(props.squareImg);
-  const rectImgSrc = props.rectImg == null ? "" : URL.createObjectURL(props.rectImg);
 
-  return (
-    <>
-      <Typography variant="h2" gutterBottom>
-        Preview
-      </Typography>
-      <Container>
-        <img 
-          className={classes.previewSquareImg}
-          src={squareImgSrc}
-          alt="Square"
-        />
-      </Container>
-      <Container>
-        <img 
-          className={classes.previewRectImg}
-          src={rectImgSrc}
-          alt="Rectangle"
-        />
-      </Container>
-    </>
-  );
-}

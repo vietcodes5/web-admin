@@ -3,15 +3,14 @@ import firebase from "firebase";
 import "firebase/firestore";
 
 import {
-  Grid,
-  Button,
-  Container
+  Grid
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import EditIcon from "@material-ui/icons/Edit";
-import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
+
 import Popup from "../components/Popup";
 import Sidebar from "../components/Sidebar"
+import CreateEvent from "../components/Event/CreateEvent"
+import PreviewEvent from '../components/Event/PreviewEvent'
 
 let useStyles = makeStyles({
   root: {
@@ -22,8 +21,9 @@ let useStyles = makeStyles({
 export default function Events() {
   let classes = useStyles();
   let db = firebase.firestore();
-  let [ events, setEvents ] = useState([]);
+  let [events, setEvents] = useState([]);
   const [event, setEvent] = useState();
+  const [openPopup, setOpenPopup] = useState(false)
 
   useEffect(() => {
     db.collection("events")
@@ -38,30 +38,24 @@ export default function Events() {
         setEvents(result);
       })
       .catch(err => console.log(err));
-  }, [ db ]);
+  }, [db]);
   const showEvent = (item) => {
     setEvent(item)
   }
+  const showAddEvent = () => {
+    setOpenPopup(true)
+  }
   return (
     <Grid container className={classes.root}>
-      <Sidebar items={events} onClickItem={showEvent}/>
+      <Sidebar items={events} onClickItem={showEvent} onClickBtnAdd={showAddEvent} />
       {
         event ?
-        <PreviewEvent event={event}></PreviewEvent>
-        : ''
+          <PreviewEvent event={event}></PreviewEvent>
+          : ''
       }
-      <Popup/>
+      <Popup open={openPopup} fullWidth={true} maxWidth="xl" updatePopup={setOpenPopup} content={<CreateEvent />} />
     </Grid>
   );
 }
-function PreviewEvent (props) {
-  return (
-    <Container>
-      <Button startIcon={<EditIcon/>} >Edit</Button>
-      <Button startIcon={<DeleteOutlineIcon/>} >Delete</Button>
-      <h1>{props.event.title}</h1>
-      <p>{props.event.content}</p>
-    </Container>
-  )
-}
+
 

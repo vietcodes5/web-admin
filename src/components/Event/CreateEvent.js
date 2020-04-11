@@ -10,12 +10,14 @@ import {
   TextField,
   TextareaAutosize,
   Button,
+  Typography,
+  Divider
 } from '@material-ui/core';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import Popup from '../components/Popup';
-import InputFile from '../components/InputFile';
+import Popup from '../Popup';
+import InputFile from '../InputFile';
 
 let useStyles = makeStyles({
   create: {
@@ -35,24 +37,16 @@ export default function CreatPost() {
   const [dialog, setDialog] = useState(false)
   let classes = useStyles()
   let storage = firebase.storage()
-  let storageRef = storage.ref()
-  let getTypeOfFile = (string) => {
-    let a = string.split('.')
-    return a[a.length - 1]
-  }
+
 
   let createPostHandler = e => {
     e.preventDefault()
     let files = e.target.imageInput.files
     let fileSquare = e.target.imageSquare.files[0]
     let fileRect = e.target.imageRect.files[0]
-    let fileNames = []
-    let nameSquare = `${uuidv4()}.${getTypeOfFile(fileSquare.name)}`
-    let nameRect = `${uuidv4()}.${getTypeOfFile(fileRect.name)}`
-    for (const file of files) {
-      let type = getTypeOfFile(file.name)
-      fileNames.push(`${uuidv4()}.${type}`);
-    }
+    let nameSquare = uuidv4();
+    let nameRect = uuidv4();
+    let fileNames = Object.keys(files).map(() => uuidv4());
     let data = {
       title: e.target.eventTitle.value,
       content: e.target.markInput.value,
@@ -68,11 +62,11 @@ export default function CreatPost() {
       .collection('events')
       .add(data)
       .then(() => {
-        storageRef.child(`/events/${nameSquare}`).put(fileSquare)
-        storageRef.child(`/events/${nameRect}`).put(fileRect)
-        for (let i = 0; i < files.length; i++) {
-          storageRef.child(`/events/${fileNames[i]}`).put(files[i])
-        }
+        storage.ref().child(`/events/${nameSquare}`).put(fileSquare)
+        storage.ref().child(`/events/${nameRect}`).put(fileRect)
+        fileNames.forEach((name, i) => {
+          storage.ref().child(`/events/${name}`).put(files[i])
+        })
       })
       .then(() => setDialog(true))
       .catch(err => console.log(err))
@@ -81,8 +75,12 @@ export default function CreatPost() {
 
   return (
     <Container>
+      <Typography variant="h4" gutterBottom>
+        Create a new post
+      </Typography>
+      <Divider />
       <Grid container>
-        <Grid container xs direction='column' className={classes.create}>
+        <Grid item className={classes.create}>
           <form onSubmit={createPostHandler}>
             <TextField name='eventTitle' label='Title Event' />
             <InputFile name='imageInput' multiple={true} label="Chọn ảnh cho event" />
@@ -98,12 +96,12 @@ export default function CreatPost() {
             <Button type='submit'>Post</Button>
           </form>
         </Grid>
-        <Grid xs>
+        <Grid item>
           Review
           <Markdown markup={markInput} />
         </Grid>
       </Grid>
-      <Popup show={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} direction="/events" />
+      <Popup open={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} />
     </Container>
   )
 }

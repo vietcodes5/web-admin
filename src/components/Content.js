@@ -4,10 +4,9 @@ import { Switch, Route } from 'react-router-dom';
 import Container from '@material-ui/core/Container';
 
 import Blog from '../pages/Blog';
-import CreatePost from '../pages/CreatePost';
-import CreateSeries from '../pages/CreateSeries';
-import Events from '../pages/Events'; 
-import CreateEvent from '../pages/CreateEvent';
+// import CreatePost from '../pages/CreatePost';
+// import CreateSeries from '../pages/CreateSeries';
+import Events from '../pages/Events';
 // import Home from './Home'
 
 import Series from '../templates/Series';
@@ -19,9 +18,6 @@ export default function Content() {
     <Container maxWidth="xl" style={{ marginTop: '20px' }}>
       <Switch>
         {/* <Route path='/' component={Home} /> */}
-        <Route path='/createblog' component={CreatePost} />
-        <Route path='/createevent' component={CreateEvent} />
-        <Route path='/series/new' component={CreateSeries} />
         <Route path='/series/:id' component={Series} />
         <Route path='/posts/:id' component={Post} />
         <Route path='/events/:id' component={Event} />

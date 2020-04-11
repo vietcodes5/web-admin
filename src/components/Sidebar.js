@@ -4,7 +4,8 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Button
+  ListSubheader,
+  Button,
 } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
@@ -16,6 +17,7 @@ let useStyle = makeStyles((theme) => ({
   list: {
     maxWidth: '250px',
     backgroundColor: theme.palette.background.paper,
+    height: '85vh'
   }
 }));
 
@@ -28,11 +30,16 @@ export default function Sidebar(props) {
   }
 
   return (
-    <List className={classes.list}>
+    <List className={classes.list}
+      subheader={
+        <ListSubheader component="div" id="nested-list-subheader">
+          {props.subheader}
+        </ListSubheader>
+      }>
       <ListItem >
         <Button onClick={() => props.onClickBtnAdd()} startIcon={<AddIcon />} variant="outlined" color="primary" >
           Add new
-        </Button>
+          </Button>
 
       </ListItem  >
       {
