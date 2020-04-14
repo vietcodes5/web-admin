@@ -6,7 +6,7 @@ let converter = new showdown.Converter();
 
 const useStyles = makeStyles(theme => ({
   markdownConfig: {
-    textIndent: '3em',
+    textIndent: '3em'
   }
 }));
 
@@ -15,9 +15,11 @@ export default function Markdown(props) {
   const classes = useStyles();
   return (
     <div
-       className={classes.markdownConfig}
-       dangerouslySetInnerHTML={{
-       __html: converter.makeHtml(children)
-     }}></div>
+      className={classes.markdownConfig}
+      dangerouslySetInnerHTML={{
+        __html: converter.makeHtml(children)
+      }}>
+
+    </div>
   )
 }

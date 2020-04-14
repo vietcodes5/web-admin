@@ -11,6 +11,7 @@ export default function Popup(props) {
   // const [open , setOpen ] = useState(false)
   return (
     <Dialog open={props.open}
+      onClose={() => { props.updatePopup(false) }}
       fullWidth={props.fullWidth}
       maxWidth={props.maxWidth}>
       <DialogContent>
@@ -19,7 +20,7 @@ export default function Popup(props) {
       <DialogActions>
         <Button variant="outlined" onClick={() => props.updatePopup(false)} color="primary">
           Đóng
-          </Button>
+        </Button>
         {
           props.btnConfirmContent &&
           <Button onClick={() => props.btnConfirmAction()}>

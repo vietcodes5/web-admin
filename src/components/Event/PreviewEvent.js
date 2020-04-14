@@ -1,14 +1,33 @@
 import React, { useState } from 'react'
 import firebase from 'firebase'
 
-import { Container, Button } from '@material-ui/core'
+import { Button, Typography, Paper, Divider } from '@material-ui/core'
+import { makeStyles } from '@material-ui/core/styles'
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 
 import Popup from '../Popup'
 import EditEvent from './EditEvent'
+import Markdown from '../Markdown'
+
+const useStyles = makeStyles((theme) => ({
+    paper: {
+        padding: '16px',
+        height: 'calc( 85vh - 48px)',
+        overflow: 'scroll',
+    },
+    actions: {
+        marginBottom: '8px',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        '& > *': {
+            marginLeft: '8px',
+        }
+    }
+}))
 
 export default function PreviewEvent(props) {
+    const classes = useStyles()
     const event = props.event
     const [openPopup, setOpenPopup] = useState(false);
     const [openPopupEdit, setOpenPopupEdit] = useState(false);
@@ -28,13 +47,16 @@ export default function PreviewEvent(props) {
         setOpenPopup(false);
     }
     return (
-        <Container>
-            <Button startIcon={<EditIcon />} onClick={() => setOpenPopupEdit(true)} >Edit</Button>
-            <Button startIcon={<DeleteOutlineIcon />} onClick={removeEvent} >Delete</Button>
-            <h1>{event.title}</h1>
-            <p>{event.content}</p>
+        <Paper className={classes.paper}>
+            <div className={classes.actions}>
+                <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={() => setOpenPopupEdit(true)} >Edit</Button>
+                <Button variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={removeEvent} >Delete</Button>
+            </div>
+            <Divider />
+            <Typography variant="h1">{event.title}</Typography>
+            <Markdown>{event.content}</Markdown>
             <Popup content="Bạn có chắc chắn muốn xoá Event này?" open={openPopup} updatePopup={setOpenPopup} btnConfirmAction={confirmRemoveEvent} btnConfirmContent="Đồng ý" />
             <Popup content={<EditEvent currentEvent={event} />} open={openPopupEdit} updatePopup={setOpenPopupEdit} fullWidth={true} maxWidth="xl" />
-        </Container>
+        </Paper>
     )
 } 

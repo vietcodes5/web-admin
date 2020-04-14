@@ -37,7 +37,6 @@ export default function Posts() {
 
   useEffect(() => {
     const db = firebase.firestore()
-
     db.collection('series')
       .get()
       .then(snapshot => {
@@ -49,7 +48,6 @@ export default function Posts() {
           ...doc.data()
         }));
         setSeries(allSeries)
-
       });
   }, []);
   let showPostsSidebar = (s) => {
@@ -90,12 +88,12 @@ export default function Posts() {
   }
 
   return (
-    <Grid container className={classes.root} spacing={0}>
-      <Grid container item lg={4} spacing={0}>
-        <Grid item lg={6}>
+    <Grid container justify="center" className={classes.root} spacing={2}>
+      <Grid container justify="center" item xs={6} md={4} spacing={2}>
+        <Grid item xs={6}>
           <Sidebar onClickBtnAdd={addNewSeries} onClickItem={showPostsSidebar} items={series} subheader="Series" />
         </Grid>
-        <Grid item lg={6}>
+        <Grid item xs={6}>
           {
             posts
               ? <Sidebar onClickBtnAdd={addNewPostHandle} onClickItem={showPost} items={posts} subheader="Posts" />
@@ -103,7 +101,7 @@ export default function Posts() {
           }
         </Grid>
       </Grid>
-      <Grid item lg={8} className={classes.preview}>
+      <Grid item xs={6} md={8} className={classes.preview}>
         {
           post instanceof Object
             ? <PreviewPost post={post} currentSeries={currentSeries} series={series} />

@@ -46,13 +46,17 @@ export default function Events() {
     setOpenPopup(true)
   }
   return (
-    <Grid container className={classes.root}>
-      <Sidebar items={events} onClickItem={showEvent} onClickBtnAdd={showAddEvent} />
-      {
-        event ?
-          <PreviewEvent event={event}></PreviewEvent>
-          : ''
-      }
+    <Grid container justify="center" spacing={3} className={classes.root}>
+      <Grid item xs={4} md={3}>
+        <Sidebar subheader="Events" items={events} onClickItem={showEvent} onClickBtnAdd={showAddEvent} />
+      </Grid>
+      <Grid item xs={8} md={9}>
+        {
+          event ?
+            <PreviewEvent event={event}></PreviewEvent>
+            : ''
+        }
+      </Grid>
       <Popup open={openPopup} fullWidth={true} maxWidth="xl" updatePopup={setOpenPopup} content={<CreateEvent />} />
     </Grid>
   );

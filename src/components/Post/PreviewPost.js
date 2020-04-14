@@ -45,12 +45,15 @@ export default function PreviewPost(props) {
     }
     const confirmRemovePostHandle = async () => {
         try {
+            //remove photos in post
             post.photos.forEach(photoName => {
                 storageRef.child(`/blog/${photoName}`).delete();
             })
+            //remove post
             const postRef = db.collection('posts').doc(post.id)
             await postRef
                 .delete()
+            //update posts in series
             let docSeries = await seriesRef.get()
             let dataSeries = docSeries.data()
             let newPosts = dataSeries.posts.filter(p => p.id !== post.id)
