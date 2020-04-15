@@ -17,6 +17,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import Popup from "../Popup";
 import Markdown from "../Markdown";
+import Alert from '../Alert';
 
 let useStyles = makeStyles({
   create: {
@@ -69,21 +70,40 @@ export default function CreatPost(props) {
   const [title, updateTitle] = useState("");
   const [opening, updateOpening] = useState("");
   const [dialog, setDialog] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState();
 
+  const [alertComponent, setAlertComponent] = useState(null);
+
+  const setAlert = (status, content, time = 3) => {
+    setAlertComponent(<Alert status={status} content={content} />)
+    setTimeout(() => setAlertComponent(null), time * 1000);
+  }
   let classes = useStyles();
   let storage = firebase.storage();
   let storageRef = storage.ref();
   let seriesId = null
-  let createPostHandler = e => {
+  let handleFormSubmit = e => {
     e.preventDefault();
+    if (!title) {
+      setAlert('warning', 'Bạn chưa nhập title');
+      return;
+    }
+    else if (!opening) {
+      setAlert('warning', 'Bạn chưa nhập opening')
+      return;
+    } else if (!content) {
+      setAlert('warning', 'Bạn chưa nhập nội dung');
+      return;
+    } else if (!files) {
+      setAlert('warning', 'Bạn chưa tải ảnh nào cho Post này');
+      return;
+    }
+
     props.series.forEach(s => {
       if (s.title === e.target.series.value) {
         seriesId = s.id;
       }
     });
-    console.log(seriesId);
-
 
     let seriesRef = firebase.firestore().collection('series').doc(seriesId)
     // create random file names
@@ -141,7 +161,7 @@ export default function CreatPost(props) {
                 Markdown Cheat Sheet
               </a>
             </Typography>
-            <form onSubmit={createPostHandler}>
+            <form onSubmit={handleFormSubmit}>
               <Autocomplete
                 options={props.series}
                 freeSolo
@@ -229,6 +249,7 @@ export default function CreatPost(props) {
         updatePopup={setDialog}
         direction="/posts"
       />
+      {alertComponent}
     </Container>
   );
 }

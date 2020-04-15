@@ -4,8 +4,7 @@ import firebase from 'firebase';
 import 'firebase/firestore';
 
 import {
-    Container,
-    Button, Paper
+    Button, Paper, Typography, Divider
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import EditIcon from '@material-ui/icons/Edit';
@@ -18,15 +17,20 @@ const useStyles = makeStyles(theme => ({
     root: {
 
     },
-    button: {
-        margin: '0px 10px'
-    },
     paper: {
-        padding: '24px'
+        padding: '16px'
     },
-    btnActionWrapper: {
+    header: {
         display: 'flex',
-        flexDirection: 'flex-end',
+        justifyContent: 'space-between'
+    },
+    actionsWrapper: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginBottom: '8px',
+        '& > *': {
+            marginRight: '8px'
+        }
     }
 
 }))
@@ -72,11 +76,14 @@ export default function PreviewPost(props) {
 
     return (
         <Paper className={classes.paper}>
-            <Container className={classes.btnActionWrapper}>
-                <Button className={classes.button} onClick={editPostHandle} variant="contained" startIcon={<EditIcon />}>Edit</Button>
-                <Button className={classes.button} onClick={removePostHandle} variant="contained" color="secondary" startIcon={<DeleteIcon />}>Delete</Button>
-            </Container>
-            <h1>{post.title}</h1>
+            <div className={classes.header}>
+                <Typography>{post.title}</Typography>
+                <div className={classes.actionsWrapper}>
+                    <Button onClick={editPostHandle} variant="contained" color="primary" startIcon={<EditIcon />}>Edit</Button>
+                    <Button onClick={removePostHandle} variant="outlined" startIcon={<DeleteIcon />}>Delete</Button>
+                </div>
+            </div>
+            <Divider />
             <MarkDown>{post.content}</MarkDown>
             <Popup open={openPopup} updatePopup={setOpenPopup} content="Bạn có chắc chắn muốn xoá Post này?" btnConfirmAction={confirmRemovePostHandle} btnConfirmContent="Đồng ý" />
             <Popup open={openPopupEdit} updatePopup={setPopupEdit} content={<EditPost currentSeries={props.currentSeries} post={post} series={props.series} />} fullWidth={true} maxWidth="xl" />

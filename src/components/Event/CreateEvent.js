@@ -41,19 +41,16 @@ export default function CreatPost() {
   const [dialog, setDialog] = useState(false);
   const [title, updateTitle] = useState('');
   const [content, updateContent] = useState('');
-  const [validateTile, updateValidateTitle] = useState();
-  const [validateContent, updateValidateContent] = useState();
 
-  const [alertStatus, setAlertStatus] = useState('');
-  const [alertContent, setAlertContent] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
+  const [alertComponent, setAlertComponent] = useState(null);
+
+  const setAlert = (status, content, time = 3) => {
+    setAlertComponent(<Alert status={status} content={content} />)
+    setTimeout(() => setAlertComponent(null), time * 1000);
+  }
+
   let classes = useStyles()
   let storage = firebase.storage()
-  const setAlert = (status, content) => {
-    setAlertStatus(status);
-    setAlertContent(content);
-    setShowAlert(true);
-  }
 
   let createPostHandler = e => {
     e.preventDefault()
@@ -61,14 +58,12 @@ export default function CreatPost() {
     let fileSquare = e.target.imageSquare.files[0]
     let fileRect = e.target.imageRect.files[0]
     if (!title) {
-      updateValidateTitle(true);
-    }
-    if (!content) {
-      updateValidateContent(true);
-    }
-    if (!files || !fileSquare || !fileRect || !title || !content) {
-      updateValidateTitle(true)
-      setAlert('warning', "Bạn cần điền đầy đủ thông tin!!!")
+      setAlert('warning', 'Bạn chưa điền title');
+      return;
+    } else if (!content) {
+      setAlert('warning', 'Bạn chưa điền nội dung');
+    } else if (!files || !fileSquare || !fileRect) {
+      setAlert('warning', "Bạn chưa chọn hết ảnh cho Event");
       return;
     }
     let nameSquare = uuidv4();
@@ -110,11 +105,9 @@ export default function CreatPost() {
         <Grid item className={classes.create} xs={5}>
           <form noValidate onSubmit={createPostHandler}>
             <TextField name='title' label='Title Event' variant="outlined"
-              error={validateTile}
               value={title}
               onChange={(e) => {
                 e.persist()
-                updateValidateTitle(false);
                 updateTitle(e.target.value);
               }} />
             <InputFile name='imageInput' multiple={true} label="Chọn ảnh cho event" required />
@@ -149,7 +142,7 @@ export default function CreatPost() {
         </Grid>
       </Grid>
       <Popup open={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} />
-      <Alert showAlert={showAlert} updateAlert={setShowAlert} alertStatus={alertStatus} alertContent={alertContent} />
+      {alertComponent}
     </Container >
   )
 }

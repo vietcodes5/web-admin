@@ -23,7 +23,7 @@ export default function Popup(props) {
         </Button>
         {
           props.btnConfirmContent &&
-          <Button onClick={() => props.btnConfirmAction()}>
+          <Button variant="contained" color="primary" onClick={() => props.btnConfirmAction()}>
             {props.btnConfirmContent}
           </Button>
         }

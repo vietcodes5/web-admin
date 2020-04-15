@@ -16,6 +16,10 @@ const useStyles = makeStyles((theme) => ({
         height: 'calc( 85vh - 48px)',
         overflow: 'scroll',
     },
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between'
+    },
     actions: {
         marginBottom: '8px',
         display: 'flex',
@@ -48,12 +52,15 @@ export default function PreviewEvent(props) {
     }
     return (
         <Paper className={classes.paper}>
-            <div className={classes.actions}>
-                <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={() => setOpenPopupEdit(true)} >Edit</Button>
-                <Button variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={removeEvent} >Delete</Button>
+            <div className={classes.header}>
+                <Typography variant="h1">{event.title}</Typography>
+
+                <div className={classes.actions}>
+                    <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={() => setOpenPopupEdit(true)} >Edit</Button>
+                    <Button variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={removeEvent} >Delete</Button>
+                </div>
             </div>
             <Divider />
-            <Typography variant="h1">{event.title}</Typography>
             <Markdown>{event.content}</Markdown>
             <Popup content="Bạn có chắc chắn muốn xoá Event này?" open={openPopup} updatePopup={setOpenPopup} btnConfirmAction={confirmRemoveEvent} btnConfirmContent="Đồng ý" />
             <Popup content={<EditEvent currentEvent={event} />} open={openPopupEdit} updatePopup={setOpenPopupEdit} fullWidth={true} maxWidth="xl" />
