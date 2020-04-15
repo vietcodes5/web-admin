@@ -18,7 +18,10 @@ export default function Popup(props) {
         {props.content}
       </DialogContent>
       <DialogActions>
-        <Button variant="outlined" onClick={() => props.updatePopup(false)} color="primary">
+        <Button variant="outlined" onClick={() => {
+          props.updatePopup(false);
+          window.location.reload()
+        }} color="primary">
           Đóng
         </Button>
         {

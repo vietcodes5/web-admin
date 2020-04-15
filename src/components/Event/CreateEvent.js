@@ -62,6 +62,7 @@ export default function CreatPost() {
       return;
     } else if (!content) {
       setAlert('warning', 'Bạn chưa điền nội dung');
+      return;
     } else if (!files || !fileSquare || !fileRect) {
       setAlert('warning', "Bạn chưa chọn hết ảnh cho Event");
       return;
