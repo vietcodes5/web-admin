@@ -64,8 +64,7 @@ export default function PreviewPost(props) {
             await seriesRef.update({
                 posts: newPosts
             })
-            setOpenPopup(false)
-
+            window.location.reload(false);
         } catch (err) {
             console.log(err);
         }

@@ -12,7 +12,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import PreviewSeries from './PreviewSeries'
-import Alert from '../Alert'
+import Alert from '../Alert';
+import Popup from '../Popup';
 
 import firebase from 'firebase';
 import 'firebase/storage';
@@ -72,6 +73,7 @@ export default function CreateSeries(props) {
   const classes = useStyles();
 
   const [alertComponent, setAlertComponent] = useState(null);
+  const [dialog, setDialog] = useState(false);
 
   let setAlert = (status, content, time) => {
     setAlertComponent(<Alert status={status} content={content} time={time} />)
@@ -138,6 +140,7 @@ export default function CreateSeries(props) {
           .add(newSeriesData)
           .then(data => {
             console.log(data);
+            setDialog(true);
           })
           .catch(error => {
             console.log(error);
@@ -235,6 +238,7 @@ export default function CreateSeries(props) {
         </Grid>
       </Grid>
       {alertComponent}
+      <Popup content="Bạn đã tạo thành công series" open={dialog} updatePopup={setDialog} />
     </Container>
   );
 

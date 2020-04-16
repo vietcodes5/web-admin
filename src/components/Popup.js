@@ -20,14 +20,16 @@ export default function Popup(props) {
       <DialogActions>
         <Button variant="outlined" onClick={() => {
           props.updatePopup(false);
-          window.location.reload()
+          window.location.reload(false);
         }} color="primary">
           Đóng
         </Button>
         {
           props.btnConfirmContent &&
-          <Button variant="contained" color="primary" onClick={() => props.btnConfirmAction()}>
-            {props.btnConfirmContent}
+          <Button variant="contained" color="primary" onClick={() => {
+            props.btnConfirmAction();
+          }}>
+            Đồng ý
           </Button>
         }
       </DialogActions>

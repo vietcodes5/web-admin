@@ -90,8 +90,7 @@ export default function PreviewPost(props) {
             dataSeries.posts.forEach(postRef => postRef.delete())
             await seriesRef
                 .delete()
-            setOpenPopup(false)
-
+            window.location.reload(false);
         } catch (err) {
             console.log(err);
         }

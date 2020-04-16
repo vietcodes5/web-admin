@@ -40,15 +40,19 @@ export default function PreviewEvent(props) {
     const removeEvent = () => {
         setOpenPopup(true);
     }
-    const confirmRemoveEvent = async () => {
-        Object.values(event.main_photos).forEach(photoName => {
-            storage.ref().child(`/events/${photoName}`).delete();
-        });
-        event.photos.forEach(photoName => {
-            storage.ref().child(`/events/${photoName}`).delete();
-        });
-        db.collection('events').doc(event.id).delete();
-        setOpenPopup(false);
+    const confirmRemoveEvent = () => {
+        let promises = [
+            Object.values(event.main_photos).forEach(photoName => {
+                storage.ref().child(`/events/${photoName}`).delete();
+            }),
+            event.photos.forEach(photoName => {
+                storage.ref().child(`/events/${photoName}`).delete();
+            }),
+            db.collection('events').doc(event.id).delete(),
+        ]
+        Promise.all(promises).then(() =>
+            window.location.reload()
+        ).catch(err => console.log(err))
     }
     return (
         <Paper className={classes.paper}>
