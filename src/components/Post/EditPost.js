@@ -9,6 +9,7 @@ import {
   TextareaAutosize,
   Button,
   Typography,
+  Link
 } from "@material-ui/core";
 
 import Autocomplete from "@material-ui/lab/Autocomplete";
@@ -60,7 +61,7 @@ let useStyles = makeStyles({
     padding: '5px 10px',
     fontFamily: 'Roboto',
     fontSize: '14px',
-  }
+  }, 
 });
 
 export default function CreatPost(props) {
@@ -162,11 +163,12 @@ export default function CreatPost(props) {
         <Grid item xs={5} className={classes.create}>
           <Typography variant="body1">
             Note: for anyone not knowing Markdown:
-            <a
+            <Link
               href="http://markdownguide.org/cheat-sheet"
-              target="_blank" rel="noopener noreferrer">
+              target="_blank" rel="noopener noreferrer"
+            >
               Markdown Cheat Sheet
-            </a>
+            </Link>
           </Typography>
           <form id="formEdit" onSubmit={UpdatePostHandler}>
             <Autocomplete

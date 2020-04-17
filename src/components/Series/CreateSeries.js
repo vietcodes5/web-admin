@@ -12,6 +12,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import PreviewSeries from './PreviewSeries'
+import Alert from '../Alert';
+import Popup from '../Popup';
 
 import firebase from 'firebase';
 import 'firebase/storage';
@@ -70,6 +72,82 @@ export default function CreateSeries(props) {
   const [newSeries, updateNewSeries] = useState(defaultValues);
   const classes = useStyles();
 
+  const [alertComponent, setAlertComponent] = useState(null);
+  const [dialog, setDialog] = useState(false);
+
+  let setAlert = (status, content, time) => {
+    setAlertComponent(<Alert status={status} content={content} time={time} />)
+    setTimeout(() => setAlertComponent(null), time)
+  }
+
+  function handleImageChange(e) {
+    e.persist();
+
+    updateNewSeries(prevState => ({
+      ...prevState,
+      cover_image: {
+        ...prevState.cover_image,
+        [e.target.name]: e.target.files[0]
+      }
+    }));
+  }
+
+  function handleInputChange(e) {
+    e.persist();
+
+    updateNewSeries(prevState => ({
+      ...prevState,
+      [e.target.name]: e.target.value
+    }));
+  }
+
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    if (!newSeries.title) {
+      setAlert('warning', 'Bạn chưa có title cho Series', 3000)
+      return;
+    } else if (!newSeries.description) {
+      setAlert('warning', 'Bạn chưa có mô tả cho Series', 3000)
+      return;
+    } else if (!newSeries.cover_image.rect || !newSeries.cover_image.square) {
+      setAlert('warning', 'Bạn chưa có ảnh cho Series', 3000)
+      return;
+    }
+    const db = firebase.firestore();
+    const storageRef = firebase.storage().ref();
+
+    const promises = [
+      storageRef.child(`/blog/${uuidv4()}`).put(newSeries.cover_image.rect),
+      storageRef.child(`/blog/${uuidv4()}`).put(newSeries.cover_image.square),
+    ];
+
+    Promise
+      .all(promises)
+      .then((data) => {
+        const rectImageName = data[0].metadata.name,
+          squareImageName = data[1].metadata.name;
+
+        const newSeriesData = {
+          ...newSeries,
+          cover_image: {
+            rect: rectImageName,
+            square: squareImageName,
+          },
+          posts: []
+        };
+
+        db.collection('series')
+          .add(newSeriesData)
+          .then(data => {
+            console.log(data);
+            setDialog(true);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      });
+  }
+
   return (
     <Container>
       <Typography variant="h1" gutterBottom>
@@ -126,8 +204,7 @@ export default function CreateSeries(props) {
                   id="rect_image"
                   onChange={handleImageChange}
                   type="file"
-                  name="rect"
-                  required />
+                  name="rect" />
               </div>
 
               <div style={{ display: 'inline-block', margin: '5px 0' }}>
@@ -140,8 +217,7 @@ export default function CreateSeries(props) {
                   id="square_image"
                   onChange={handleImageChange}
                   type="file"
-                  name="square"
-                  required />
+                  name="square" />
               </div>
             </div>
 
@@ -161,66 +237,10 @@ export default function CreateSeries(props) {
           />
         </Grid>
       </Grid>
+      {alertComponent}
+      <Popup content="Bạn đã tạo thành công series" open={dialog} updatePopup={setDialog} />
     </Container>
   );
 
-  function handleImageChange(e) {
-    e.persist();
 
-    updateNewSeries(prevState => ({
-      ...prevState,
-      cover_image: {
-        ...prevState.cover_image,
-        [e.target.name]: e.target.files[0]
-      }
-    }));
-  }
-
-  function handleInputChange(e) {
-    e.persist();
-
-    updateNewSeries(prevState => ({
-      ...prevState,
-      [e.target.name]: e.target.value
-    }));
-  }
-
-  function handleFormSubmit(e) {
-    e.preventDefault();
-
-    const db = firebase.firestore();
-    const storageRef = firebase.storage().ref();
-
-    const promises = [
-      storageRef.child(`/blog/${uuidv4()}`).put(newSeries.cover_image.rect),
-      storageRef.child(`/blog/${uuidv4()}`).put(newSeries.cover_image.square),
-    ];
-
-    Promise
-      .all(promises)
-      .then((data) => {
-        const rectImageName = data[0].metadata.name,
-          squareImageName = data[1].metadata.name;
-
-        const newSeriesData = {
-          ...newSeries,
-          cover_image: {
-            rect: rectImageName,
-            square: squareImageName,
-          },
-          posts: []
-        };
-
-        db.collection('series')
-          .add(newSeriesData)
-          .then(data => {
-            console.log(data);
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      });
-  }
 }
-
-

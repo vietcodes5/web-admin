@@ -11,7 +11,9 @@ import {
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import PreviewSeries from './PreviewSeries'
+import PreviewSeries from './PreviewSeries';
+import Popup from '../Popup';
+import Alert from '../Alert';
 
 import firebase from 'firebase';
 import 'firebase/storage';
@@ -66,11 +68,18 @@ const defaultValues = {
 }
 
 export default function CreateSeries(props) {
+  const classes = useStyles();
   const [series, updateSeries] = useState(defaultValues);
   const [newImages, updateNewImages] = useState(null);
-
-  const classes = useStyles();
+  const [openPopup, setOpenPopup] = useState(false);
   const currentSeries = props.currentSeries
+  const [alertComponent, setAlertComponent] = useState(null);
+
+  const setAlert = (status, content, time = 3) => {
+    setAlertComponent(<Alert status={status} content={content} />)
+    setTimeout(() => setAlertComponent(null), time * 1000);
+  }
+
   useEffect(() => {
     updateSeries(currentSeries)
     updateNewImages()
@@ -95,24 +104,33 @@ export default function CreateSeries(props) {
 
   async function handleFormSubmit(e) {
     e.preventDefault();
-
     const db = firebase.firestore();
     const storageRef = firebase.storage().ref();
+    if (!series.title) {
+      setAlert('warning', 'Bạn chưa có title cho Series', 3)
+      return;
+    } else if (!series.description) {
+      setAlert('warning', 'Bạn chưa có mô tả cho Series', 3)
+      return;
+    } else if (!series.cover_image.rect || !series.cover_image.square) {
+      setAlert('warning', 'Bạn chưa có ảnh cho Series', 3)
+      return;
+    }
     try {
       await db.collection('series').doc(currentSeries.id)
         .update(series)
         .catch(error => {
           console.log(error);
         });
-      console.log(newImages);
 
-      if (newImages.rect) {
+      if (newImages && newImages.rect) {
         await storageRef.child(`/blog/${series.cover_image.rect}`).delete()
         await storageRef.child(`/blog/${series.cover_image.rect}`).put(newImages.rect)
-      } else if (newImages.square) {
+      } else if (newImages && newImages.square) {
         await storageRef.child(`/blog/${series.cover_image.square}`).delete()
         await storageRef.child(`/blog/${series.cover_image.square}`).put(newImages.square)
       }
+      setOpenPopup(true);
     } catch (err) {
       console.log(err);
 
@@ -203,16 +221,13 @@ export default function CreateSeries(props) {
           <PreviewSeries
             editing={false}
             currentSeries={series}
-            squareImgSrc={newImages.square}
-            rectImgSrc={newImages.rect}
           />
         </Grid>
       </Grid>
+      <Popup content="Đã sửa thành công" open={openPopup} updatePopup={setOpenPopup} />
+      {alertComponent}
     </Container>
   );
 
 
 }
-
-
-

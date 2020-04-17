@@ -1,5 +1,6 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
+import { Typography } from '@material-ui/core'
 
 let useStyles = makeStyles({
     input: {
@@ -7,16 +8,22 @@ let useStyles = makeStyles({
         height: '40px',
         borderRadius: '5px',
         padding: '5px',
-        width: '100%'
+        width: '95%',
+    },
+    title: {
+        fontWeight: '300',
     }
+
 })
 
 export default function InputFile(props) {
     let classes = useStyles()
     return (
         <div>
-            <label htmlFor={props.id}>{props.label}</label>
-            <input id={props.id} className={classes.input} type={props.type} name={props.name} multiple={props.multiple} />
+            <label htmlFor={props.id}>
+                <Typography variant="h5" >{props.label}</Typography>
+            </label>
+            <input className={classes.input} {...props} />
         </div>
     )
 }

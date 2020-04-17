@@ -52,30 +52,37 @@ export default function EditEvent(props) {
       title: title,
       content: content,
     }
-    let eventRef = firebase
-      .firestore()
-      .collection('events').doc(currentEvent.id)
+    try {
 
-    eventRef.update(data)
+      let eventRef = firebase
+        .firestore()
+        .collection('events').doc(currentEvent.id)
 
-    if (e.target.imageSquare.files[0]) {
-      await storage.ref().child(`events/${currentEvent.main_photos.square}`).delete()
-      await storage.ref().child(`events/${currentEvent.main_photos.square}`).put(e.target.imageSquare.files[0])
-    } else if (e.target.imageRect.files[0]) {
-      await storage.ref().child(`events/${currentEvent.main_photos.rect}`).delete()
-      await storage.ref().child(`events/${currentEvent.main_photos.rect}`).put(e.target.imageRect.files[0])
-    } else if (e.target.imagesInput.files[0]) {
-      await currentEvent.photos.forEach(photoName => {
-        storage.ref().child(`events/${photoName}`).delete()
-      })
-      let files = e.target.imagesInput.files
-      let filesName = Object.keys(files).map(() => uuidv4())
-      filesName.forEach((photoName, i) => {
-        storage.ref().child(`events/${photoName}`).put(files[i])
-      })
-      eventRef.update({
-        photos: filesName
-      })
+      eventRef.update(data)
+
+      if (e.target.imageSquare.files[0]) {
+        await storage.ref().child(`events/${currentEvent.main_photos.square}`).delete()
+        await storage.ref().child(`events/${currentEvent.main_photos.square}`).put(e.target.imageSquare.files[0])
+      } else if (e.target.imageRect.files[0]) {
+        await storage.ref().child(`events/${currentEvent.main_photos.rect}`).delete()
+        await storage.ref().child(`events/${currentEvent.main_photos.rect}`).put(e.target.imageRect.files[0])
+      } else if (e.target.imagesInput.files[0]) {
+        await currentEvent.photos.forEach(photoName => {
+          storage.ref().child(`events/${photoName}`).delete()
+        })
+        let files = e.target.imagesInput.files
+        let filesName = Object.keys(files).map(() => uuidv4())
+        filesName.forEach((photoName, i) => {
+          storage.ref().child(`events/${photoName}`).put(files[i])
+        })
+        eventRef.update({
+          photos: filesName
+        })
+      }
+      setDialog(true);
+    } catch (err) {
+      console.log(err);
+
     }
   }
 
@@ -117,7 +124,7 @@ export default function EditEvent(props) {
           </Markdown>
         </Grid>
       </Grid>
-      <Popup open={dialog} content="Event mới của bạn đã được tao" updatePopup={setDialog} />
+      <Popup open={dialog} content="Event đã được sửa" updatePopup={setDialog} />
     </Container>
   )
 }

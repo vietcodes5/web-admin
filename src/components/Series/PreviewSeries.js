@@ -5,7 +5,7 @@ import 'firebase/firestore';
 
 import {
     Container,
-    Button, Paper, Typography
+    Button, Paper, Typography, Divider
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import EditIcon from '@material-ui/icons/Edit';
@@ -17,15 +17,20 @@ const useStyles = makeStyles(theme => ({
     root: {
 
     },
-    button: {
-        margin: '0px 10px'
-    },
     paper: {
-        padding: '24px'
+        padding: '16px',
     },
-    btnActionWrapper: {
+    header: {
         display: 'flex',
-        flexDirection: 'flex-end',
+        justifyContent: 'space-between'
+    },
+    actionsWrapper: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        marginBottom: '8px',
+        '& > *': {
+            marginRight: '8px'
+        }
     },
     previewRectImg: {
         display: 'block',
@@ -37,8 +42,10 @@ const useStyles = makeStyles(theme => ({
         display: 'block',
         width: '60%',
         margin: '10px auto',
+    },
+    button: {
+        maxHeight: '40px'
     }
-
 }))
 
 export default function PreviewPost(props) {
@@ -85,8 +92,7 @@ export default function PreviewPost(props) {
             dataSeries.posts.forEach(postRef => postRef.delete())
             await seriesRef
                 .delete()
-            setOpenPopup(false)
-
+            window.location.reload(false);
         } catch (err) {
             console.log(err);
         }
@@ -98,20 +104,21 @@ export default function PreviewPost(props) {
     return (
         <Paper className={classes.paper}>
 
-            <Typography variant="h2" gutterBottom>
-                Preview Series {
-                    props.currentSeries.title
+            <div className={classes.header} >
+                <Typography variant="h2" gutterBottom>
+                    {props.currentSeries.title}
+                </Typography>
+                {
+                    props.editing ?
+                        <div className={classes.actionsWrapper}>
+                            <Button className={classes.button} onClick={editPostHandle} variant="contained" color="primary" startIcon={<EditIcon />}>Edit</Button>
+                            <Button className={classes.button} onClick={removeSeriesHandle} variant="outlined" startIcon={<DeleteIcon />}>Delete</Button>
+                        </div>
+                        : ''
                 }
-            </Typography>
-            {
-                props.editing ?
-                    <Container className={classes.btnActionWrapper}>
-                        <Button className={classes.button} onClick={editPostHandle} variant="contained" startIcon={<EditIcon />}>Edit</Button>
-                        <Button className={classes.button} onClick={removeSeriesHandle} variant="contained" color="secondary" startIcon={<DeleteIcon />}>Delete</Button>
-                    </Container>
-                    : ''
+            </div>
+            <Divider />
 
-            }
             <Container>
                 <img
                     className={classes.previewSquareImg}
