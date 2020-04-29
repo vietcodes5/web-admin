@@ -1,18 +1,16 @@
-import React,{useState, useEffect} from 'react'
-import { Link } from 'react-router-dom'
-import { 
-  Container, 
-  Grid, 
-  Button, 
-  Paper,
-  Typography,
+import React, { useState, useEffect } from 'react'
+import {
+  Grid,
 } from '@material-ui/core'
-import TreeView from '@material-ui/lab/TreeView'
-import TreeItem from '@material-ui/lab/TreeItem'
+
 
 import { makeStyles } from '@material-ui/core/styles'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import Popup from '../components/Popup'
+import Sidebar from '../components/Sidebar'
+import CreateSeries from '../components/Series/CreateSeries'
+import CreatePost from '../components/Post/CreatePost'
+import PreviewPost from '../components/Post/PreviewPost'
+import PreviewSeries from '../components/Series/PreviewSeries'
 
 import firebase from 'firebase'
 import 'firebase/firestore'
@@ -21,126 +19,100 @@ let useStyles = makeStyles(theme => ({
   root: {
     paddingTop: '24px',
   },
-  button: {
-    marginBottom: '10px',
 
-    '&:hover': {
-      backgroundColor: '#36ed4e',
-    }
-  },
-  treeView: {
-    minHeight: '216px',
-    flexGrow: 1,
-  },
+  preview: {
+    height: '85vh'
+  }
+
 }));
 
 export default function Posts() {
   let classes = useStyles()
-  const [ treeNodes, updateTreeNodes ] = useState([]);
-  const [ expanded, setExpanded ] = useState([]);
-  const [ selected, setSelected ] = useState([]);
+  const [series, setSeries] = useState([])
+  const [currentSeries, setCurrentSeries] = useState()
+  const [posts, setPosts] = useState(null)
+  const [post, setPost] = useState()
+  const [openPopup, setOpenPopup] = useState(false)
+  const [popupContent, setPopupContent] = useState('')
 
-  const handleToggle = (e, nodeIds) => setExpanded(nodeIds);
-  const handleSelect = (e, nodeIds) => setSelected(nodeIds);
-
-  useEffect(()=>{
+  useEffect(() => {
     const db = firebase.firestore()
-    
     db.collection('series')
       .get()
       .then(snapshot => {
         if (snapshot.empty) {
           return console.log('No series found');
         }
-
         let allSeries = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
-        // console.log(allSeries);
 
-        allSeries.forEach(s => {
-          const postRefs = s.posts;
-          const promises = postRefs.map(ref => ref.get());
+        setSeries(allSeries)
 
-          Promise.all(promises)
-            .then(postDocs => {
-              const posts = [];
-
-              postDocs.forEach(postDoc => {
-                posts.push({
-                  id: postDoc.id,
-                  ...postDoc.data()
-                });
-              });
-
-              const postNodes = posts.map(post => (
-                <TreeItem 
-                  key={post.id} 
-                  nodeId={post.id} 
-                  label={
-                    <Link to={`/series/${s.id}/${post.id}`}>
-                      <Typography variant="h4">{post.title}</Typography>
-                    </Link>
-                  } />
-              ));
-              const SeriesNode = (
-                <TreeItem 
-                  // 
-                  style={{padding:'10px', fontSize: '40px'}}
-                  key={s.id} 
-                  nodeId={s.id} 
-                  label={
-                    <Link to={`/series/${s.id}`}>
-                      <Typography variant="h3">{s.title}</Typography>
-                    </Link>
-                  }>
-                { postNodes }
-                </TreeItem>
-              );
-
-              updateTreeNodes(prevState => [ ...prevState, SeriesNode ]);
-            })
-            .catch(console.log);
-        });
       });
   }, []);
+  let showPostsSidebar = (s) => {
+    if (post) {
+      setPost('')
+    }
+    setCurrentSeries(s)
+    const postRefs = s.posts;
+    console.log(postRefs);
+
+    const promises = postRefs.map(ref => ref.get());
+
+    Promise.all(promises)
+      .then(postDocs => {
+        const posts = [];
+        postDocs.forEach(postDoc => {
+          posts.push({
+            id: postDoc.id,
+            ...postDoc.data()
+          });
+        });
+        console.log(posts);
+
+        setPosts(posts)
+      })
+      .catch(console.log);
+  }
+  let showPost = (item) => {
+    setPost(item)
+  }
+  let addNewSeries = () => {
+    setOpenPopup(true)
+    setPopupContent(<CreateSeries />)
+  }
+  let addNewPostHandle = () => {
+    setOpenPopup(true)
+    setPopupContent(<CreatePost currentSeries={currentSeries} series={series} />)
+  }
 
   return (
-    <Container className={classes.root}>
-      <Typography variant="h1" gutterBottom>
-        Blog
-      </Typography>
-      <Grid container>
-        <Grid item xs={4} md={6}>
-          <Link to='/createblog'>
-            <Button variant='contained' className={classes.button}>
-               Add new post
-            </Button>
-          </Link>
+    <Grid container justify="center" className={classes.root} spacing={1}>
+      <Grid container justify="center" item xs={6} md={4} spacing={1}>
+        <Grid item xs={6}>
+          <Sidebar onClickBtnAdd={addNewSeries} onClickItem={showPostsSidebar} items={series} subheader="Series" />
         </Grid>
-        <Grid item xs={4} md={6}>
-          <Link to='/series/new'>
-            <Button variant='contained' className={classes.button}>
-              Create new series
-            </Button>
-          </Link>
+        <Grid item xs={6}>
+          {
+            posts
+              ? <Sidebar onClickBtnAdd={addNewPostHandle} onClickItem={showPost} items={posts} subheader="Posts" />
+              : ''
+          }
         </Grid>
       </Grid>
-      <Paper>
-        <TreeView
-          className={classes.treeView}
-          defaultCollapseIcon={<ExpandMoreIcon />}
-          defaultExpandIcon={<ChevronRightIcon />}
-          expanded={expanded}
-          selected={selected}
-          onNodeToggle={handleToggle}
-          onNodeSelect={handleSelect}
-        >
-        { Array.isArray(treeNodes) && treeNodes.length ? treeNodes : "Loading data..." }
-        </TreeView>
-      </Paper>
-    </Container>
+      <Grid item xs={6} md={8} className={classes.preview}>
+        {
+          post instanceof Object
+            ? <PreviewPost post={post} currentSeries={currentSeries} series={series} />
+            : currentSeries ?
+              <PreviewSeries editing={true} currentSeries={currentSeries} />
+              : ''
+        }
+      </Grid>
+      <Popup open={openPopup} updatePopup={setOpenPopup} fullWidth={true} maxWidth="xl" content={popupContent} />
+    </Grid>
   );
 }
-

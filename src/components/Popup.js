@@ -1,31 +1,36 @@
-import React from "react";
-import {Link} from 'react-router-dom'
 
+import React from "react";
 
 import {
   Button,
   DialogContent,
   Dialog,
   DialogActions,
-  DialogContentText
 } from "@material-ui/core";
 
-export default function Popup (props) {
+export default function Popup(props) {
+  // const [open , setOpen ] = useState(false)
   return (
-    <Dialog open={props.show}>
+    <Dialog open={props.open}
+      onClose={() => { props.updatePopup(false) }}
+      fullWidth={props.fullWidth}
+      maxWidth={props.maxWidth}>
       <DialogContent>
-        <DialogContentText>{props.content}</DialogContentText>
+        {props.content}
       </DialogContent>
       <DialogActions>
-        <Link to={props.direction}>
-          <Button onClick={() => props.updatePopup(false)} color="primary">
-              Đóng
-          </Button>
-        </Link>
+        <Button variant="outlined" onClick={() => {
+          props.updatePopup(false);
+          window.location.reload(false);
+        }} color="primary">
+          Đóng
+        </Button>
         {
-          props.btnConfirm &&
-          <Button onClick={() => props.btnConfirmAction()}>
-            {props.btnConfirm}
+          props.btnConfirmContent &&
+          <Button variant="contained" color="primary" onClick={() => {
+            props.btnConfirmAction();
+          }}>
+            Đồng ý
           </Button>
         }
       </DialogActions>

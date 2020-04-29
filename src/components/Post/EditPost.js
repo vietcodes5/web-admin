@@ -9,13 +9,14 @@ import {
   TextareaAutosize,
   Button,
   Typography,
+  Link
 } from "@material-ui/core";
 
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 
-import Popup from "../components/Popup";
-import Markdown from "../components/Markdown";
+import Popup from "../Popup";
+import Markdown from "../Markdown";
 
 let useStyles = makeStyles({
   create: {
@@ -60,83 +61,95 @@ let useStyles = makeStyles({
     padding: '5px 10px',
     fontFamily: 'Roboto',
     fontSize: '14px',
-  }
+  }, 
 });
 
-export default function CreatPost() {
+export default function CreatPost(props) {
   const [content, updateContent] = useState("");
   const [title, updateTitle] = useState("");
   const [opening, updateOpening] = useState("");
   const [dialog, setDialog] = useState(false);
-  const [series, setSeries] = useState([]);
   const [files, setFiles] = useState([]);
 
   let classes = useStyles();
+  let db = firebase.firestore()
   let storage = firebase.storage();
   let storageRef = storage.ref();
-  let idSerie = null;
-
+  let seriesId = null
   useEffect(() => {
-    firebase
-      .firestore()
-      .collection("series")
-      .get()
-      .then(data => {
-        let result = data.docs.map(doc => {
-          return {
-            ...doc.data(),
-            id: doc.id
-          };
-        });
-        setSeries(result);
-      });
-  }, []);
+    updateTitle(props.post.title)
+    updateContent(props.post.content)
+    updateOpening(props.post.opening)
+  }, [props.post])
 
-  let createPostHandler = e => {
+  let UpdatePostHandler = async e => {
     e.preventDefault();
-    let serieName = e.target.series.value;
 
-    if (!serieName) return;
-    series.forEach(serie => {
-      if (serie.title === serieName) {
-        idSerie = serie.id;
+    props.series.forEach(s => {
+      if (s.title === e.target.series.value) {
+        seriesId = s.id
       }
-    });
-
+    })
+    let currentSeriesRef = db.collection('series').doc(seriesId)
     // create random file names
-    let fileNames = Object.keys(files).map(() => uuidv4());
+    let fileNames = []
+    if (files.length > 0) {
+      props.post.photos.forEach((photoName) => {
+        let photoRef = storageRef.child(`blog/${photoName}`);
+        photoRef.delete().then().catch()
+      })
+      fileNames = Object.keys(files).map(() => uuidv4());
+    } else {
+      fileNames = props.post.photos;
+    }
+    console.log(fileNames);
     let data = {
       title,
       opening,
       content,
-      createdAt: new Date().toISOString(),
-      photos: fileNames,
-      author: firebase.auth().currentUser.email
+      series: currentSeriesRef,
+      photos: fileNames
     };
 
     firebase
       .firestore()
       .collection("posts")
-      .add(data)
-      .then((dataReturn) => {
-        for (let i = 0; i < files.length; i++) {
-          storageRef.child(`/blog/${fileNames[i]}`).put(files[i]);
+      .doc(props.post.id)
+      .update(data).then(
+        () => {
+          if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+              storageRef.child(`/blog/${fileNames[i]}`).put(files[i]);
+            }
+          }
+          updateIdBlogToSeries(currentSeriesRef);
+          setDialog(true)
         }
-
-        updateIdBlogToSeries(dataReturn);
-        setDialog(true);
-      })
-      .catch(err => console.log(err));
+      ).catch((err) => console.log(err))
   };
-  let updateIdBlogToSeries = data => {
-    firebase
-      .firestore()
-      .collection("series")
-      .doc(idSerie)
-      .update({
-        posts: firebase.firestore.FieldValue.arrayUnion(data)
-      })
-      .then(() => setDialog(true));
+  let updateIdBlogToSeries = async (currentSeriesRef) => {
+    let preSeriesId = props.currentSeries.id
+    if (preSeriesId === seriesId) {
+      return;
+    } else {
+      try {
+        let currentPostRef = db.collection('posts').doc(props.post.id)
+        await currentSeriesRef.update({
+          posts: firebase.firestore.FieldValue.arrayUnion(currentPostRef)
+        })
+        let preSeriesRef = db
+          .collection("series")
+          .doc(preSeriesId)
+        let dataPreSeries = await preSeriesRef.get()
+        let newPostRefs = dataPreSeries.data().posts.filter((post) => post.id !== props.post.id)
+        preSeriesRef.update({
+          posts: newPostRefs
+        })
+      }
+      catch (err) {
+        console.log(err);
+      }
+    }
   };
 
   return (
@@ -150,18 +163,19 @@ export default function CreatPost() {
         <Grid item xs={5} className={classes.create}>
           <Typography variant="body1">
             Note: for anyone not knowing Markdown:
-            <a
+            <Link
               href="http://markdownguide.org/cheat-sheet"
-              target="_blank" rel="noopener noreferrer">
+              target="_blank" rel="noopener noreferrer"
+            >
               Markdown Cheat Sheet
-            </a>
+            </Link>
           </Typography>
-          <form onSubmit={createPostHandler}>
+          <form id="formEdit" onSubmit={UpdatePostHandler}>
             <Autocomplete
-              options={series}
+              options={props.series}
               freeSolo
               getOptionLabel={option => option.title}
-              getOptionSelected={option => option.id}
+              value={props.currentSeries}
               style={{ width: 300 }}
               renderInput={params => (
                 <TextField
@@ -175,6 +189,7 @@ export default function CreatPost() {
             />
 
             <TextField
+              name="title"
               label="Title"
               value={title}
               onChange={(e) => {
@@ -196,6 +211,7 @@ export default function CreatPost() {
               rowsMax="25"
               placeholder="Blog content"
               className={classes.contentInput}
+              value={content}
               onChange={(e) => {
                 e.persist();
                 updateContent(() => e.target.value);
@@ -213,7 +229,7 @@ export default function CreatPost() {
               multiple
             />
 
-            <Button type="submit">Post</Button>
+            <Button variant="contained" color="primary" type="submit">Update</Button>
           </form>
         </Grid>
 
@@ -227,19 +243,18 @@ export default function CreatPost() {
             </Markdown>
           </div>
 
-          <Typography variant="body2">
+          {/* <Typography variant="body2">
             Chosen images:
-          </Typography>
-          <ul>
-            {Object.keys(files).map(index => <li key={files[index].name}>{files[index].name}</li>)}
-          </ul>
+            <ul>
+              {Object.keys(files).map(index => <li key={files[index].name}>{files[index].name}</li>)}
+            </ul>
+          </Typography> */}
         </Grid>
       </Grid>
       <Popup
-        show={dialog}
-        content="Blog mới Đã được tạo"
+        open={dialog}
+        content="Blog đã được sửa"
         updatePopup={setDialog}
-        direction="/posts"
       />
     </Container>
   );
