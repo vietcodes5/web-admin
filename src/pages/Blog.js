@@ -5,14 +5,12 @@ import {
 
 
 import { makeStyles } from '@material-ui/core/styles'
-
 import Popup from '../components/Popup'
 import Sidebar from '../components/Sidebar'
 import CreateSeries from '../components/Series/CreateSeries'
 import CreatePost from '../components/Post/CreatePost'
 import PreviewPost from '../components/Post/PreviewPost'
 import PreviewSeries from '../components/Series/PreviewSeries'
-
 
 import firebase from 'firebase'
 import 'firebase/firestore'
@@ -21,9 +19,11 @@ let useStyles = makeStyles(theme => ({
   root: {
     paddingTop: '24px',
   },
+
   preview: {
     height: '85vh'
   }
+
 }));
 
 export default function Posts() {
@@ -47,7 +47,9 @@ export default function Posts() {
           id: doc.id,
           ...doc.data()
         }));
+
         setSeries(allSeries)
+
       });
   }, []);
   let showPostsSidebar = (s) => {

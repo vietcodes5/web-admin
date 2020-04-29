@@ -13,6 +13,7 @@ import {
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 import Description from '@material-ui/icons/Description';
 import EventNoteIcon from '@material-ui/icons/EventNote';
+
 import {makeStyles} from '@material-ui/core/styles'
 
 import firebase from 'firebase';
@@ -20,7 +21,7 @@ import 'firebase/auth';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // border: "1px solid black",
+// border: "1px solid black",
     justifyContent: "space-between",
   },
   typography:{
