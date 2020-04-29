@@ -1,25 +1,32 @@
 import React from 'react'
-import {makeStyles} from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
+import { Typography } from '@material-ui/core'
 
 let useStyles = makeStyles({
-    input:{
+    input: {
         border: '1px solid #3333',
         height: '40px',
         borderRadius: '5px',
         padding: '5px',
-        width: '100%'
+        width: '95%',
+    },
+    title: {
+        fontWeight: '300',
     }
+
 })
 
-export default function InputFile(props){
+export default function InputFile(props) {
     let classes = useStyles()
-    return(
+    return (
         <div>
-            <label for={props.id}>{props.label}</label>
-            <input id={props.id} class={classes.input} type={props.type} name={props.name} multiple={props.multiple} />
+            <label htmlFor={props.id}>
+                <Typography variant="h5" >{props.label}</Typography>
+            </label>
+            <input className={classes.input} {...props} />
         </div>
     )
 }
 InputFile.defaultProps = {
-    type : "file"
+    type: "file"
 }
